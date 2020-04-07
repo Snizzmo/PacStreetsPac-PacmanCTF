@@ -1,3 +1,4 @@
+@@ -1,92 +0,0 @@
 # myTeam.py
 # ---------
 # Licensing Information:  You are free to use or extend these projects for
@@ -89,4 +90,3 @@ class DummyAgent(CaptureAgent):
     '''
 
     return random.choice(actions)
-
