@@ -184,36 +184,137 @@ class CenterAgent(ReflexCaptureAgent):
     self.setCenter(gameState)
 
   def setCenter(self, gameState):
-    centerX = (gameState.data.layout.width - 2)
+    centerX = (gameState.data.layout.width - 2) / 2
     if not self.red: 
       centerX += 1
     self.defaultPos = []
 
-    print(gameState.data.layout.height)
     for y in range(1, gameState.data.layout.height -1):
+      #print(gameState.hasWall(centerX, 4))
       if not gameState.hasWall(centerX, y):
         self.defaultPos.append((centerX, y))
-      if gameState.hasWall(centerX, y): 
+      #if gameState.hasWall(centerX, y): 
+        #print(centerX, y, "has a wall")
 
     for y in range(len(self.defaultPos)):
       if len(self.defaultPos) > 2: 
         self.defaultPos.remove(self.defaultPos[0])
         self.defaultPos.remove(self.defaultPos[-1])
-    self.target = self.defaultPos[0]
+    # print(self.defaultPos)
+    self.target = self.defaultPos[0] #Set the target 
+    #Target is self.target = (#, #)
+
+  def chooseAction(self, gameState):
+    noPacActions = []
+    actions = gameState.getLegalActions(self.index)
+    # pos = gameState.getAgentPosition(self.index)
+    
+    # if pos == self.target: 
+    #   self.target = None
+
+    for a in actions: 
+      newState = gameState.generateSuccessor(self.index, a)
+      if not newState.getAgentState(self.index).isPacman: 
+        noPacActions.append(a)
+    # noPacActions.remove('Stop')
+    centerX = (gameState.data.layout.width - 2) / 2
+    enemy1pos = gameState.getAgentPosition((self.index+1) % 4)
+    enemy2pos = gameState.getAgentPosition((self.index+3) % 4)
+#logic for mirroring
+    if self.red:
+      if (gameState.getAgentPosition(self.index)[0] <= centerX) and (gameState.getAgentPosition(self.index)[0] > (gameState.data.layout.width / 2) - (gameState.data.layout.width / 8)):
+        #print("corect eighth")
+        mirrorX = ((enemy1pos[0] + enemy2pos[0]) / 2) #make this the nearest X that is less than 1/2 width that is not hasWall
+        mirrorY = ((enemy1pos[1] + enemy2pos[1]) / 2)
+        print("mirror")
+        if (gameState.hasWall(mirrorX, mirrorY)): 
+          #check +1 and -1 to both x and y
+          if not gameState.hasWall(mirrorX-1, mirrorY): 
+            self.target = (mirrorX-1, mirrorY)
+          elif not gameState.hasWall(mirrorX-1, mirrorY-1): 
+            self.target = (mirrorX-1, mirrorY-1)
+          elif not gameState.hasWall(mirrorX, mirrorY-1): 
+            self.target = (mirrorX, mirrorY-1)
+          # pick closest on tie
+        else: 
+          self.target = (mirrorX, mirrorY)
+
+  # Simple chasing defense  
+    #if we red
+    if self.red: 
+      if enemy1pos[0] <= centerX: 
+        self.target = enemy1pos
+      elif enemy2pos[0] <= centerX: 
+        self.target = enemy2pos
+      else: 
+        self.setCenter(gameState)
+    #if we blue
+    else: 
+      if enemy1pos[0] >= centerX: 
+        self.target = enemy1pos
+      elif enemy2pos[0] >= centerX: 
+        self.setCenter(gameState)
+    
+    
+    # print enemy1pos
+    # print enemy2pos
+
+
+    fvalues = []
+    for a in noPacActions: 
+      nextState = gameState.generateSuccessor(self.index, a)
+      newpos = nextState.getAgentPosition(self.index)
+      fvalues.append(self.getMazeDistance(newpos, self.target))
+    best = min(fvalues)
+    bestActions = [a for a, v in zip(noPacActions, fvalues) if v == best]
+    bestAction = random.choice(bestActions)
+    return(bestAction) 
+
+class AttackAgent(ReflexCaptureAgent): 
+  def __init__(self, index):
+    CaptureAgent.__init__(self, index)
+    self.target = None    
+
+  def registerInitialState(self, gameState):
+    self.start = gameState.getAgentPosition(self.index)
+    CaptureAgent.registerInitialState(self, gameState)
+    self.setCenter(gameState)
+
+  def setCenter(self, gameState):
+    centerX = (gameState.data.layout.width - 2) / 2
+    if not self.red: 
+      centerX += 1
+    self.defaultPos = []
+
+    for y in range(1, gameState.data.layout.height -1):
+      print(gameState.hasWall(centerX, 4))
+      if not gameState.hasWall(centerX, y):
+        self.defaultPos.append((centerX, y))
+      if gameState.hasWall(centerX, y): 
+        print(centerX, y, "has a wall")
+
+    for y in range(len(self.defaultPos)):
+      if len(self.defaultPos) > 2: 
+        self.defaultPos.remove(self.defaultPos[0])
+        self.defaultPos.remove(self.defaultPos[-1])
+    # print(self.defaultPos)
+    self.target = self.defaultPos[0] #Set the target 
+    #Target is self.target = (#, #)
 
   def chooseAction(self, gameState):
     noPacActions = []
     actions = gameState.getLegalActions(self.index)
     pos = gameState.getAgentPosition(self.index)
-    if pos == self.target: 
-      self.target = None
+    
+    # if pos == self.target: 
+    #   self.target = None
 
     for a in actions: 
       newState = gameState.generateSuccessor(self.index, a)
       if not newState.getAgentState(self.index).isPacman: 
         noPacActions.append(a)
 
-    noPacActions.remove('Stop')
+    # noPacActions.remove('Stop')
 
     fvalues = []
     for a in noPacActions: 
