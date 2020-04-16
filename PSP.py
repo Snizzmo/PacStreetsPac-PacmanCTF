@@ -188,9 +188,17 @@ class CenterAgent(ReflexCaptureAgent):
     if not self.red: 
       centerX += 1
     self.defaultPos = []
+
+    #BUG: NOT DETECTING WALLS?
+    print(gameState.data.layout.height)
     for y in range(1, gameState.data.layout.height -1):
+      print(centerX, y)
       if not gameState.hasWall(centerX, y):
-        self.defaultPos.append((centerX,y))
+        self.defaultPos.append((centerX, y))
+      if gameState.hasWall(centerX, y): 
+        print(centerX, y)
+    print(self.defaultPos)
+
     for y in range(len(self.defaultPos)):
       if len(self.defaultPos) > 2: 
         self.defaultPos.remove(self.defaultPos[0])
@@ -199,7 +207,7 @@ class CenterAgent(ReflexCaptureAgent):
     print(self.defaultPos)
 
   def chooseAction(self, gameState):
-    goodActions = []
+    noPacActions = []
     actions = gameState.getLegalActions(self.index)
     pos = gameState.getAgentPosition(self.index)
     if pos == self.target: 
@@ -208,8 +216,15 @@ class CenterAgent(ReflexCaptureAgent):
     for a in actions: 
       newState = gameState.generateSuccessor(self.index, a)
       if not newState.getAgentState(self.index).isPacman: 
-        goodActions.append(a)
+        noPacActions.append(a)
 
+    fvalues = []
+    for a in noPacActions: 
+      nextState = gameState.generateSuccessor(self.index, a)
+      newpos = nextState.getAgentPosition(self.index)
+      fvalues.append(self.getMazeDistance(newpos, self.target))
 
-
-    return(goodActions[0]) #TO_DO: make it smart. Implement a way to find the best action to get to target. 
+    best = min(fvalues)
+    bestActions = [a for a, v in zip(noPacActions, fvalues) if v == best]
+    bestAction = random.choice(bestActions)
+    return(bestAction) 
