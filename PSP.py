@@ -35,7 +35,7 @@ getRedTeamIndices, getBlueTeamIndices, isOnRedTeam, getAgentDistances, getInitia
 #################
 
 def createTeam(firstIndex, secondIndex, isRed,
-               first = 'CenterAgent', second = 'DummyAgent'):
+               first = 'CenterAgent', second = 'SelfPreserve'):
   """
   This function should return a list of two agents that will form the
   team, initialized using firstIndex and secondIndex as their agent
@@ -173,93 +173,107 @@ class ReflexCaptureAgent(CaptureAgent):
     """
     return {'successorScore': 1.0}
 
+
+
 class CenterAgent(ReflexCaptureAgent): 
+  # to set the target: self.target = (#, #)
+  # to set the target to the center position of the board: self.setCenter(gameState)
+  
+  #This initializes the CenterAgent
   def __init__(self, index):
     CaptureAgent.__init__(self, index)
-    self.target = None    
+    self.target = None   
 
+  #This initializes the initital state
   def registerInitialState(self, gameState):
     self.start = gameState.getAgentPosition(self.index)
     CaptureAgent.registerInitialState(self, gameState)
     self.setCenter(gameState)
 
+  #This sets the target to the center position of the board
   def setCenter(self, gameState):
     centerX = (gameState.data.layout.width - 2) / 2
     if not self.red: 
       centerX += 1
     self.defaultPos = []
-
     for y in range(1, gameState.data.layout.height -1):
-      #print(gameState.hasWall(centerX, 4))
       if not gameState.hasWall(centerX, y):
         self.defaultPos.append((centerX, y))
-      #if gameState.hasWall(centerX, y): 
-        #print(centerX, y, "has a wall")
-
     for y in range(len(self.defaultPos)):
       if len(self.defaultPos) > 2: 
         self.defaultPos.remove(self.defaultPos[0])
         self.defaultPos.remove(self.defaultPos[-1])
-    # print(self.defaultPos)
     self.target = self.defaultPos[0] #Set the target 
-    #Target is self.target = (#, #)
 
+# choose an action (necessary for capture.py)
   def chooseAction(self, gameState):
-    noPacActions = []
+    # all possible actions
     actions = gameState.getLegalActions(self.index)
-    # pos = gameState.getAgentPosition(self.index)
     
-    # if pos == self.target: 
-    #   self.target = None
+    # Useful positions
+    centerX = (gameState.data.layout.width-1) / 2
+    if not self.red:
+      centerX += 1
 
+    enemy1pos = gameState.getAgentPosition((self.index+1) % 4)
+    enemy2pos = gameState.getAgentPosition((self.index+3) % 4)
+    
+    # removes the options that would make the agent pacman (use noPacActions list from here on out instead of actions)
+    noPacActions = []
     for a in actions: 
       newState = gameState.generateSuccessor(self.index, a)
       if not newState.getAgentState(self.index).isPacman: 
         noPacActions.append(a)
-    # noPacActions.remove('Stop')
-    centerX = (gameState.data.layout.width - 2) / 2
-    enemy1pos = gameState.getAgentPosition((self.index+1) % 4)
-    enemy2pos = gameState.getAgentPosition((self.index+3) % 4)
-#logic for mirroring
-    if self.red:
+    
+  # mirror enemy average
+    mirrorY = ((enemy1pos[1] + enemy2pos[1]) / 2)
+    #if we red
+    if self.red: 
+      for x in range(1, centerX): 
+          if not gameState.hasWall(x, mirrorY): 
+            mirrorX = x
+      #set the target to the enermy average
       if (gameState.getAgentPosition(self.index)[0] <= centerX) and (gameState.getAgentPosition(self.index)[0] > (gameState.data.layout.width / 2) - (gameState.data.layout.width / 8)):
-        #print("corect eighth")
-        mirrorX = ((enemy1pos[0] + enemy2pos[0]) / 2) #make this the nearest X that is less than 1/2 width that is not hasWall
-        mirrorY = ((enemy1pos[1] + enemy2pos[1]) / 2)
-        print("mirror")
-        if (gameState.hasWall(mirrorX, mirrorY)): 
-          #check +1 and -1 to both x and y
-          if not gameState.hasWall(mirrorX-1, mirrorY): 
-            self.target = (mirrorX-1, mirrorY)
-          elif not gameState.hasWall(mirrorX-1, mirrorY-1): 
-            self.target = (mirrorX-1, mirrorY-1)
-          elif not gameState.hasWall(mirrorX, mirrorY-1): 
-            self.target = (mirrorX, mirrorY-1)
-          # pick closest on tie
-        else: 
-          self.target = (mirrorX, mirrorY)
+        self.target = (mirrorX, mirrorY)
+    #if we blue
+    else: 
+      #print(range(centerX, gameState.data.layout.width))
+      for x in range(centerX, gameState.data.layout.width): 
+        if not gameState.hasWall(x, mirrorY): 
+            mirrorX = x
+            break
+        else:
+          continue
+      if (gameState.getAgentPosition(self.index)[0] >= centerX) and (gameState.getAgentPosition(self.index)[0] < (gameState.data.layout.width / 2) + (gameState.data.layout.width / 8)):
+        self.target = (mirrorX, mirrorY)
+
 
   # Simple chasing defense  
-    #if we red
+    # if we red
     if self.red: 
       if enemy1pos[0] <= centerX: 
         self.target = enemy1pos
       elif enemy2pos[0] <= centerX: 
         self.target = enemy2pos
       else: 
-        self.setCenter(gameState)
-    #if we blue
+        if (gameState.getAgentPosition(self.index)[0] <= centerX) and (gameState.getAgentPosition(self.index)[0] > (gameState.data.layout.width / 2) - (gameState.data.layout.width / 8)):
+          self.target = (mirrorX, mirrorY)
+        else:
+          self.setCenter(gameState)
+    # if we blue
     else: 
       if enemy1pos[0] >= centerX: 
         self.target = enemy1pos
       elif enemy2pos[0] >= centerX: 
-        self.setCenter(gameState)
-    
-    
-    # print enemy1pos
-    # print enemy2pos
-
-
+        self.target = enemy2pos
+      else: 
+        if (gameState.getAgentPosition(self.index)[0] >= centerX) and (gameState.getAgentPosition(self.index)[0] < (gameState.data.layout.width / 2) + (gameState.data.layout.width / 8)):
+          self.target = (mirrorX, mirrorY)
+        else:
+          self.setCenter(gameState)
+      
+        
+    # Select the best move to that goal
     fvalues = []
     for a in noPacActions: 
       nextState = gameState.generateSuccessor(self.index, a)
@@ -270,59 +284,88 @@ class CenterAgent(ReflexCaptureAgent):
     bestAction = random.choice(bestActions)
     return(bestAction) 
 
-class AttackAgent(ReflexCaptureAgent): 
+class SelfPreserve(ReflexCaptureAgent):
+  # to set the target: self.target = (#, #)
+  # to set the target to the center position of the board: self.setCenter(gameState)
+
+  #This initializes the CenterAgent
   def __init__(self, index):
     CaptureAgent.__init__(self, index)
-    self.target = None    
+    self.target = None   
 
+  #This initializes the initital state
   def registerInitialState(self, gameState):
     self.start = gameState.getAgentPosition(self.index)
     CaptureAgent.registerInitialState(self, gameState)
     self.setCenter(gameState)
-
+  
+#This sets the target to the center position of the board
   def setCenter(self, gameState):
     centerX = (gameState.data.layout.width - 2) / 2
     if not self.red: 
       centerX += 1
-    self.defaultPos = []
 
+    self.defaultPos = []
     for y in range(1, gameState.data.layout.height -1):
-      print(gameState.hasWall(centerX, 4))
       if not gameState.hasWall(centerX, y):
         self.defaultPos.append((centerX, y))
-      if gameState.hasWall(centerX, y): 
-        print(centerX, y, "has a wall")
-
     for y in range(len(self.defaultPos)):
       if len(self.defaultPos) > 2: 
         self.defaultPos.remove(self.defaultPos[0])
         self.defaultPos.remove(self.defaultPos[-1])
-    # print(self.defaultPos)
     self.target = self.defaultPos[0] #Set the target 
-    #Target is self.target = (#, #)
-
+  
   def chooseAction(self, gameState):
-    noPacActions = []
+    # all possible actions
     actions = gameState.getLegalActions(self.index)
-    pos = gameState.getAgentPosition(self.index)
+
+    #set centerX
+    centerX = (gameState.data.layout.width - 2) / 2
+    if not self.red: 
+      centerX += 1
+
+
+    if(self.target[0] <= centerX and gameState.getAgentPosition(self.index)[0] <= centerX): #if the current target is on RED side of the board
+      # Get list of food and enemy positions
+      foodList = self.getFood(gameState).asList()
+      enemy1pos = gameState.getAgentPosition((self.index+1) % 4)
+      enemy2pos = gameState.getAgentPosition((self.index+3) % 4)
+
+      # greedy and dumb foodie
+      foodDistances = []
+      for food in foodList: 
+        if (self.getMazeDistance(food, enemy1pos) > self.getMazeDistance(food, gameState.getAgentPosition(self.index)) and self.getMazeDistance(food, enemy2pos) > self.getMazeDistance(food, gameState.getAgentPosition(self.index))): 
+          # foodDistances.append((food, self.getMazeDistance(food, gameState.getAgentPosition(self.index)),))
+          foodDistances.append(food)
+          self.target = food
+
+      # # select the best food for the target
+      # if len(foodDistances) > 0: 
+      #   for t in foodDistances:
+      #     # print(t[1])
+          
+      #     best = min(foodDistances[1])
+      #     bestTargets = [p for p, f in foodDistances if f == best]
+      #     if len(bestTargets) > 0: 
+      #       self.target = bestTargets[0]
+      # # print(self.target)
     
-    # if pos == self.target: 
-    #   self.target = None
-
-    for a in actions: 
-      newState = gameState.generateSuccessor(self.index, a)
-      if not newState.getAgentState(self.index).isPacman: 
-        noPacActions.append(a)
-
-    # noPacActions.remove('Stop')
-
+    #once food captured, reset to center
+    if not (gameState.hasFood(self.target[0], self.target[1])) and self.target[0] > centerX: 
+      if self.red: 
+        for x in range(1, centerX): 
+            if not gameState.hasWall(x, gameState.getAgentPosition(self.index)[1]): 
+              recovery = (x, gameState.getAgentPosition(self.index)[1])
+        self.target = recovery
+        
+    
+    # Select the best move to that goal
     fvalues = []
-    for a in noPacActions: 
+    for a in actions: 
       nextState = gameState.generateSuccessor(self.index, a)
       newpos = nextState.getAgentPosition(self.index)
       fvalues.append(self.getMazeDistance(newpos, self.target))
-
     best = min(fvalues)
-    bestActions = [a for a, v in zip(noPacActions, fvalues) if v == best]
+    bestActions = [a for a, v in zip(actions, fvalues) if v == best]
     bestAction = random.choice(bestActions)
     return(bestAction) 
