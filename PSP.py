@@ -191,19 +191,15 @@ class CenterAgent(ReflexCaptureAgent):
 
     print(gameState.data.layout.height)
     for y in range(1, gameState.data.layout.height -1):
-      print(centerX, y)
       if not gameState.hasWall(centerX, y):
         self.defaultPos.append((centerX, y))
       if gameState.hasWall(centerX, y): 
-        print(centerX, y)
-    print(self.defaultPos)
 
     for y in range(len(self.defaultPos)):
       if len(self.defaultPos) > 2: 
         self.defaultPos.remove(self.defaultPos[0])
         self.defaultPos.remove(self.defaultPos[-1])
     self.target = self.defaultPos[0]
-    print(self.defaultPos)
 
   def chooseAction(self, gameState):
     noPacActions = []
@@ -216,6 +212,8 @@ class CenterAgent(ReflexCaptureAgent):
       newState = gameState.generateSuccessor(self.index, a)
       if not newState.getAgentState(self.index).isPacman: 
         noPacActions.append(a)
+
+    noPacActions.remove('Stop')
 
     fvalues = []
     for a in noPacActions: 
