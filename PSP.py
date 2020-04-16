@@ -35,7 +35,7 @@ getRedTeamIndices, getBlueTeamIndices, isOnRedTeam, getAgentDistances, getInitia
 #################
 
 def createTeam(firstIndex, secondIndex, isRed,
-               first = 'agentOne', second = 'DummyAgent'):
+               first = 'CenterAgent', second = 'DummyAgent'):
   """
   This function should return a list of two agents that will form the
   team, initialized using firstIndex and secondIndex as their agent
@@ -103,7 +103,7 @@ class DummyAgent(CaptureAgent):
 
     return random.choice(actions)
 
-class agentOne(CaptureAgent):
+class ReflexCaptureAgent(CaptureAgent):
   def registerInitialState(self, gameState):
     self.start = gameState.getAgentPosition(self.index)
     CaptureAgent.registerInitialState(self, gameState)
@@ -172,3 +172,44 @@ class agentOne(CaptureAgent):
     a counter or a dictionary.
     """
     return {'successorScore': 1.0}
+
+class CenterAgent(ReflexCaptureAgent): 
+  def __init__(self, index):
+    CaptureAgent.__init__(self, index)
+    self.target = None    
+
+  def registerInitialState(self, gameState):
+    self.start = gameState.getAgentPosition(self.index)
+    CaptureAgent.registerInitialState(self, gameState)
+    self.setCenter(gameState)
+
+  def setCenter(self, gameState):
+    centerX = (gameState.data.layout.width - 2)
+    if not self.red: 
+      centerX += 1
+    self.defaultPos = []
+    for y in range(1, gameState.data.layout.height -1):
+      if not gameState.hasWall(centerX, y):
+        self.defaultPos.append((centerX,y))
+    for y in range(len(self.defaultPos)):
+      if len(self.defaultPos) > 2: 
+        self.defaultPos.remove(self.defaultPos[0])
+        self.defaultPos.remove(self.defaultPos[-1])
+    self.target = self.defaultPos[0]
+    print(self.defaultPos)
+
+  def chooseAction(self, gameState):
+    goodActions = []
+    actions = gameState.getLegalActions(self.index)
+    pos = gameState.getAgentPosition(self.index)
+    if pos == self.target: 
+      self.target = None
+
+    for a in actions: 
+      newState = gameState.generateSuccessor(self.index, a)
+      if not newState.getAgentState(self.index).isPacman: 
+        goodActions.append(a)
+
+
+
+    return(goodActions[0]) #TO_DO: make it smart. Implement a way to find the best action to get to target. 
