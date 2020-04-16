@@ -189,7 +189,6 @@ class CenterAgent(ReflexCaptureAgent):
       centerX += 1
     self.defaultPos = []
 
-    #BUG: NOT DETECTING WALLS?
     print(gameState.data.layout.height)
     for y in range(1, gameState.data.layout.height -1):
       print(centerX, y)
