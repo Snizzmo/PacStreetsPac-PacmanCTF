@@ -35,7 +35,7 @@ getRedTeamIndices, getBlueTeamIndices, isOnRedTeam, getAgentDistances, getInitia
 #################
 
 def createTeam(firstIndex, secondIndex, isRed,
-               first = 'CenterAgent', second = 'SelfPreserve'):
+               first = 'CenterAgent', second = 'OneDot'):
   """
   This function should return a list of two agents that will form the
   team, initialized using firstIndex and secondIndex as their agent
@@ -284,7 +284,7 @@ class CenterAgent(ReflexCaptureAgent):
     bestAction = random.choice(bestActions)
     return(bestAction) 
 
-class SelfPreserve(ReflexCaptureAgent):
+class OneDot(ReflexCaptureAgent):
   # to set the target: self.target = (#, #)
   # to set the target to the center position of the board: self.setCenter(gameState)
 
