@@ -313,7 +313,7 @@ class OneDot(ReflexCaptureAgent):
       if len(self.defaultPos) > 2: 
         self.defaultPos.remove(self.defaultPos[0])
         self.defaultPos.remove(self.defaultPos[-1])
-    self.target = self.defaultPos[0] #Set the target 
+    self.target = self.defaultPos[0] #Set the target
   
   def chooseAction(self, gameState):
     # all possible actions
@@ -325,33 +325,40 @@ class OneDot(ReflexCaptureAgent):
       centerX += 1
 
     if self.red: 
-      if(self.target[0] <= centerX and gameState.getAgentPosition(self.index)[0] <= centerX): #if the current target and agent are on RED side of the board
-        # Get list of food and enemy positions
-        foodList = self.getFood(gameState).asList()
-        enemy1pos = gameState.getAgentPosition((self.index+1) % 4)
-        enemy2pos = gameState.getAgentPosition((self.index+3) % 4)
+        if(self.target[0] <= centerX and gameState.getAgentPosition(self.index)[0] <= centerX): #if the current target and agent are on RED side of the board
+            # Get list of food and enemy positions
+            foodList = self.getFood(gameState).asList()
+            enemy1pos = gameState.getAgentPosition((self.index+1) % 4)
+            enemy2pos = gameState.getAgentPosition((self.index+3) % 4)
 
-        # greedy and dumb foodie
-        foodDistances = []
-        for food in foodList: 
-          if (self.getMazeDistance(food, enemy1pos) > self.getMazeDistance(food, gameState.getAgentPosition(self.index)) and self.getMazeDistance(food, enemy2pos) > self.getMazeDistance(food, gameState.getAgentPosition(self.index))): 
-            # foodDistances.append((food, self.getMazeDistance(food, gameState.getAgentPosition(self.index)),))
-            foodDistances.append(food)
-            self.target = food
+            # greedy and dumb foodie
+            foodDistances = []
+            for food in foodList: 
+                if (self.getMazeDistance(food, enemy1pos) > self.getMazeDistance(food, gameState.getAgentPosition(self.index)) and self.getMazeDistance(food, enemy2pos) > self.getMazeDistance(food, gameState.getAgentPosition(self.index))): 
+                    foodDistances.append((food, self.getMazeDistance(food, gameState.getAgentPosition(self.index)),))
+                    minDist = min(f[1] for f in foodDistances)
+                    for f in foodDistances:
+                        if f[1] == minDist:
+                            self.target = f[0]
+                            print(f[0])
+    
     else: #if blue
-      if(self.target[0] >= centerX and gameState.getAgentPosition(self.index)[0] >= centerX): #if the current target and agent are on BLUE side of the board
-        # Get list of food and enemy positions
-        foodList = self.getFood(gameState).asList()
-        enemy1pos = gameState.getAgentPosition((self.index+1) % 4)
-        enemy2pos = gameState.getAgentPosition((self.index+3) % 4)
+        if(self.target[0] >= centerX and gameState.getAgentPosition(self.index)[0] >= centerX): #if the current target and agent are on BLUE side of the board
+            # Get list of food and enemy positions
+            foodList = self.getFood(gameState).asList()
+            enemy1pos = gameState.getAgentPosition((self.index+1) % 4)
+            enemy2pos = gameState.getAgentPosition((self.index+3) % 4)
 
-        # greedy and dumb foodie
-        foodDistances = []
-        for food in foodList: 
-          if (self.getMazeDistance(food, enemy1pos) > self.getMazeDistance(food, gameState.getAgentPosition(self.index)) and self.getMazeDistance(food, enemy2pos) > self.getMazeDistance(food, gameState.getAgentPosition(self.index))): 
-            # foodDistances.append((food, self.getMazeDistance(food, gameState.getAgentPosition(self.index)),))
-            foodDistances.append(food)
-            self.target = food
+            # greedy and dumb foodie
+            foodDistances = []
+            for food in foodList: 
+                if (self.getMazeDistance(food, enemy1pos) > self.getMazeDistance(food, gameState.getAgentPosition(self.index)) and self.getMazeDistance(food, enemy2pos) > self.getMazeDistance(food, gameState.getAgentPosition(self.index))): 
+                    foodDistances.append((food, self.getMazeDistance(food, gameState.getAgentPosition(self.index)),))
+                    minDist = min(f[1] for f in foodDistances)
+                    for f in foodDistances:
+                        if f[1] == minDist:
+                            self.target = f[0]
+                            print(f[0])
     
     #once food captured, reset to center
     if self.red: 
@@ -378,3 +385,48 @@ class OneDot(ReflexCaptureAgent):
     bestActions = [a for a, v in zip(actions, fvalues) if v == best]
     bestAction = random.choice(bestActions)
     return(bestAction) 
+
+
+"""
+Pseudocode for the final version
+- pellets drop on location upon death
+- give modes, where
+    if both death, go attack
+    if score is higher, go defense
+
+yolo mode for last X moves? if we are losing? hyper defensive if we are winning? 
+
+
+1. Find all legal actions (can I go up?)
+2. Rule out options leading to ghosts/dead ends
+    Start simple for now (if Ghost is 5 away, dont go that way)
+3. Determine mode (attack or defend)
+    if we are winning, body guard 1:1 (make our first go to the same Y and closest X as their first, and 2nd to 2nd)
+    if no clear preference, 1 a 1 d
+    if we are losing by a lot (more than 1/4(?) of points available) 2 a
+4. Of remaining options: choose via mode (we want to go to enemy pellets if attack mode)
+
+
+defense mode: 
+    use as written except: 
+    change preference for killing the closer enemy
+        if e1, check e2 blah blah
+
+attack mode:
+done1. actions = gameState.getLegalActions(self.index)
+    2.  if an action's gamestate leads to distance of me and ghost being < #(modular number)
+            then remove that action
+        select pellet target if I can get there before the enemy
+        for retrieval: 
+            if the distance between me and safety is > distance from enemy to me
+                go the other way
+            if the distance between me and safety is <  distance from me to enemy by small amount
+                go to safety
+                    if safety = power pellet, 
+                        get home in 20 moves or min moves (whichever greater)
+                    if safety = home
+                        go home  
+            if the distance between me and safety is significantly < distance from me to enenmy
+                go for new pellet
+
+"""
