@@ -324,41 +324,50 @@ class SelfPreserve(ReflexCaptureAgent):
     if not self.red: 
       centerX += 1
 
+    if self.red: 
+      if(self.target[0] <= centerX and gameState.getAgentPosition(self.index)[0] <= centerX): #if the current target and agent are on RED side of the board
+        # Get list of food and enemy positions
+        foodList = self.getFood(gameState).asList()
+        enemy1pos = gameState.getAgentPosition((self.index+1) % 4)
+        enemy2pos = gameState.getAgentPosition((self.index+3) % 4)
 
-    if(self.target[0] <= centerX and gameState.getAgentPosition(self.index)[0] <= centerX): #if the current target is on RED side of the board
-      # Get list of food and enemy positions
-      foodList = self.getFood(gameState).asList()
-      enemy1pos = gameState.getAgentPosition((self.index+1) % 4)
-      enemy2pos = gameState.getAgentPosition((self.index+3) % 4)
+        # greedy and dumb foodie
+        foodDistances = []
+        for food in foodList: 
+          if (self.getMazeDistance(food, enemy1pos) > self.getMazeDistance(food, gameState.getAgentPosition(self.index)) and self.getMazeDistance(food, enemy2pos) > self.getMazeDistance(food, gameState.getAgentPosition(self.index))): 
+            # foodDistances.append((food, self.getMazeDistance(food, gameState.getAgentPosition(self.index)),))
+            foodDistances.append(food)
+            self.target = food
+    else: #if blue
+      if(self.target[0] >= centerX and gameState.getAgentPosition(self.index)[0] >= centerX): #if the current target and agent are on BLUE side of the board
+        # Get list of food and enemy positions
+        foodList = self.getFood(gameState).asList()
+        enemy1pos = gameState.getAgentPosition((self.index+1) % 4)
+        enemy2pos = gameState.getAgentPosition((self.index+3) % 4)
 
-      # greedy and dumb foodie
-      foodDistances = []
-      for food in foodList: 
-        if (self.getMazeDistance(food, enemy1pos) > self.getMazeDistance(food, gameState.getAgentPosition(self.index)) and self.getMazeDistance(food, enemy2pos) > self.getMazeDistance(food, gameState.getAgentPosition(self.index))): 
-          # foodDistances.append((food, self.getMazeDistance(food, gameState.getAgentPosition(self.index)),))
-          foodDistances.append(food)
-          self.target = food
-
-      # # select the best food for the target
-      # if len(foodDistances) > 0: 
-      #   for t in foodDistances:
-      #     # print(t[1])
-          
-      #     best = min(foodDistances[1])
-      #     bestTargets = [p for p, f in foodDistances if f == best]
-      #     if len(bestTargets) > 0: 
-      #       self.target = bestTargets[0]
-      # # print(self.target)
+        # greedy and dumb foodie
+        foodDistances = []
+        for food in foodList: 
+          if (self.getMazeDistance(food, enemy1pos) > self.getMazeDistance(food, gameState.getAgentPosition(self.index)) and self.getMazeDistance(food, enemy2pos) > self.getMazeDistance(food, gameState.getAgentPosition(self.index))): 
+            # foodDistances.append((food, self.getMazeDistance(food, gameState.getAgentPosition(self.index)),))
+            foodDistances.append(food)
+            self.target = food
     
     #once food captured, reset to center
-    if not (gameState.hasFood(self.target[0], self.target[1])) and self.target[0] > centerX: 
-      if self.red: 
+    if self.red: 
+      if not (gameState.hasFood(self.target[0], self.target[1])) and self.target[0] > centerX: 
         for x in range(1, centerX): 
             if not gameState.hasWall(x, gameState.getAgentPosition(self.index)[1]): 
               recovery = (x, gameState.getAgentPosition(self.index)[1])
         self.target = recovery
+    else: #if blue team
+      if not (gameState.hasFood(self.target[0], self.target[1])) and self.target[0] < centerX: 
+        for x in range(centerX, gameState.data.layout.width-1):
+          if not gameState.hasWall(x, gameState.getAgentPosition(self.index)[1]): 
+              recovery = (x, gameState.getAgentPosition(self.index)[1])
+              break
+        self.target = recovery
         
-    
     # Select the best move to that goal
     fvalues = []
     for a in actions: 
