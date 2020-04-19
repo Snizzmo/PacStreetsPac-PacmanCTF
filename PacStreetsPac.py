@@ -415,18 +415,6 @@ class SmartAgent(ReflexCaptureAgent): #currently only attacking
         self.defaultPos.remove(self.defaultPos[-1])
     self.target = self.defaultPos[0] #Set the target
 
-  def runGhosts(self, gameState, actions):
-    enemy1pos = gameState.getAgentPosition((self.index+1) % 4)
-    enemy2pos = gameState.getAgentPosition((self.index+3) % 4)
-    enemies = [enemy1pos, enemy2pos]
-    for e in enemies: 
-      for a in actions: 
-        newState = gameState.generateSuccessor(self.index, a)
-        currDist = (self.distancer.getDistance(gameState.getAgentPosition(self.index), e))
-        newDist = (self.distancer.getDistance(newState.getAgentPosition(self.index), e))
-        if newDist < currDist and newDist < 2: 
-          actions.remove(a)
-
   def chooseAction(self, gameState):
     # all possible actions
     actions = gameState.getLegalActions(self.index)
@@ -489,7 +477,7 @@ class SmartAgent(ReflexCaptureAgent): #currently only attacking
         self.target = recovery
         
     # Select the best move to that goal 
-    #TO DO: IMPROVE THIS BECAUSE IT MAKES OUR LITTLE DUDE FREEZE UP
+  
     # fvalues = []
     # for a in actions: 
     #   nextState = gameState.generateSuccessor(self.index, a)
@@ -515,6 +503,7 @@ class SmartAgent(ReflexCaptureAgent): #currently only attacking
 
 
 # if it makes me closer to ghost, large. 
+# TO DO: Add logic so that it only does this on the enemy's side
     for a in actions: 
       nextState = gameState.generateSuccessor(self.index, a)
       newpos = nextState.getAgentPosition(self.index)
@@ -527,18 +516,22 @@ class SmartAgent(ReflexCaptureAgent): #currently only attacking
 
       if (newDistToGhost1 <= currDistToGhost1 and newDistToGhost1 < 3) or (newDistToGhost2 <= currDistToGhost2 and newDistToGhost2 < 3): #3 should depend on map
         gDists = [newDistToGhost1, newDistToGhost2]
-        moveValues.append(max(gDists)*10)
-        self.setCenter(gameState)
+        moveValues.append(max(gDists)*10) #10 should be relative to the map
+        self.setCenter(gameState) # This currently just runs to center. replace with closest x,y on our team's side
       else:
         moveValues.append(self.getMazeDistance(newpos, self.target))
 
 
 
-    print(self.target, actions, moveValues)
+    #print(self.target, actions, moveValues)
     best = min(moveValues)
     bestActions = [a for a, v in zip(actions, moveValues) if v == best]
     bestAction = random.choice(bestActions)
     return(bestAction) 
+
+
+#TO DO: Helper function to find the closest x,y on our team side
+#TO DO: add power pellet mode
 
 """
 Pseudocode for the final version
@@ -568,7 +561,7 @@ defense mode:
 attack mode:
 done1. actions = gameState.getLegalActions(self.index)
     2.  if an action's gamestate leads to distance of me and ghost being < #(modular number)
-            then remove that action
+            then remove that action // Then weight that action higher
         select pellet target if I can get there before the enemy
         for retrieval: 
             if the distance between me and safety is > distance from enemy to me
