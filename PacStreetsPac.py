@@ -233,7 +233,7 @@ class CenterAgent(ReflexCaptureAgent):
           if not gameState.hasWall(x, mirrorY): 
             mirrorX = x
       #set the target to the enermy average
-      if (gameState.getAgentPosition(self.index)[0] <= centerX) and (gameState.getAgentPosition(self.index)[0] > (gameState.data.layout.width / 2) - (gameState.data.layout.width / 8)):
+      if (gameState.getAgentPosition(self.index)[0] <= centerX) and (gameState.getAgentPosition(self.index)[0] > ((gameState.data.layout.width / 2) - (gameState.data.layout.width / 8))):
         self.target = (mirrorX, mirrorY)
     #if we blue
     else: 
@@ -244,7 +244,7 @@ class CenterAgent(ReflexCaptureAgent):
             break
         else:
           continue
-      if (gameState.getAgentPosition(self.index)[0] >= centerX) and (gameState.getAgentPosition(self.index)[0] < (gameState.data.layout.width / 2) + (gameState.data.layout.width / 8)):
+      if (gameState.getAgentPosition(self.index)[0] >= centerX) and (gameState.getAgentPosition(self.index)[0] < ((gameState.data.layout.width / 2) + (gameState.data.layout.width / 8))):
         self.target = (mirrorX, mirrorY)
 
 
@@ -256,10 +256,11 @@ class CenterAgent(ReflexCaptureAgent):
       elif enemy2pos[0] <= centerX: 
         self.target = enemy2pos
       else: 
-        if (gameState.getAgentPosition(self.index)[0] <= centerX) and (gameState.getAgentPosition(self.index)[0] > (gameState.data.layout.width / 2) - (gameState.data.layout.width / 8)):
-          self.target = (mirrorX, mirrorY)
-        else:
-          self.setCenter(gameState)
+        self.target = (mirrorX, mirrorY)
+        # if (gameState.getAgentPosition(self.index)[0] <= centerX) and (gameState.getAgentPosition(self.index)[0] > (gameState.data.layout.width / 2) - (gameState.data.layout.width / 8)):
+        #   self.target = (mirrorX, mirrorY)
+        # else:
+        #   self.setCenter(gameState)
     # if we blue
     else: 
       if enemy1pos[0] >= centerX: 
@@ -267,10 +268,11 @@ class CenterAgent(ReflexCaptureAgent):
       elif enemy2pos[0] >= centerX: 
         self.target = enemy2pos
       else: 
-        if (gameState.getAgentPosition(self.index)[0] >= centerX) and (gameState.getAgentPosition(self.index)[0] < (gameState.data.layout.width / 2) + (gameState.data.layout.width / 8)):
-          self.target = (mirrorX, mirrorY)
-        else:
-          self.setCenter(gameState)
+        self.target = (mirrorX, mirrorY)
+        # if (gameState.getAgentPosition(self.index)[0] >= centerX) and (gameState.getAgentPosition(self.index)[0] < (gameState.data.layout.width / 2) + (gameState.data.layout.width / 8)):
+        #   self.target = (mirrorX, mirrorY)
+        # else:
+        #   self.setCenter(gameState)
       
         
     # Select the best move to that goal
@@ -320,11 +322,10 @@ class SmartAgent(ReflexCaptureAgent): #currently only attacking
         self.defaultPos.remove(self.defaultPos[-1])
     self.target = self.defaultPos[0] #Set the target
 
-  """
-  def chooseTarget(self, mode, gameState):
-    if mode == 'attack'
-      # target the closest food if I am on safe side of board
-      if self.red == gameState.getAgentPosition(self.index)[0] <= centerX: #I am on my side of board
+  def chooseTarget(self, mode, gameState, centerX):
+    if mode == 'attack':
+      # target the closest food if I am on safe side of board 
+      if self.red == (gameState.getAgentPosition(self.index)[0] <= centerX): #I am on my side of board
         # Get list of food and enemy positions
         foodList = self.getFood(gameState).asList()
         enemy1pos = gameState.getAgentPosition((self.index+1) % 4)
@@ -333,15 +334,15 @@ class SmartAgent(ReflexCaptureAgent): #currently only attacking
         # find the closest dot 
         foodDistances = []
         for food in foodList: 
-        if (self.getMazeDistance(food, enemy1pos) > self.getMazeDistance(food, gameState.getAgentPosition(self.index)) and self.getMazeDistance(food, enemy2pos) > self.getMazeDistance(food, gameState.getAgentPosition(self.index))): 
-          foodDistances.append((food, self.getMazeDistance(food, gameState.getAgentPosition(self.index)),))
-          minDist = min(f[1] for f in foodDistances)
-          self.target = f[0] for f in foodDistances if f[1] == minDist
-          # for f in foodDistances:
-          #     if f[1] == minDist:
-          #       self.target = f[0]
-      else (I am on opponent side of board)
-        #
+          if (self.getMazeDistance(food, enemy1pos) > self.getMazeDistance(food, gameState.getAgentPosition(self.index)) and self.getMazeDistance(food, enemy2pos) > self.getMazeDistance(food, gameState.getAgentPosition(self.index))): 
+            foodDistances.append((food, self.getMazeDistance(food, gameState.getAgentPosition(self.index)),))
+            minDist = min(f[1] for f in foodDistances)
+            targets = [f[0] for f in foodDistances if f[1] == minDist]
+            self.target = min(targets)
+            # for f in foodDistances:
+            #     if f[1] == minDist:
+            #       self.target = f[0]
+      #else (I am on opponent side of board)
 
       #once food captured, reset to center
       if self.red: 
@@ -356,17 +357,17 @@ class SmartAgent(ReflexCaptureAgent): #currently only attacking
             if not gameState.hasWall(x, gameState.getAgentPosition(self.index)[1]): 
                 recovery = (x, gameState.getAgentPosition(self.index)[1])
                 break
-          self.target = recover
+          self.target = recovery
       
-    elif mode == 'defence': 
-      code
-    elif mode == 'bodyguard': 
-      code
-    elif mode == 'yolo': 
-      code
-    else: 
-      code
-  """
+    # elif mode == 'defence': 
+    #   code
+    # elif mode == 'bodyguard': 
+    #   code
+    # elif mode == 'yolo': 
+    #   code
+    # else: 
+    #   code
+
 
   def chooseAction(self, gameState):
     # all possible actions
@@ -374,58 +375,58 @@ class SmartAgent(ReflexCaptureAgent): #currently only attacking
     # self.runGhosts(gameState, actions) #May not be necessary 
     centerX = self.findCenterX(gameState) #find the centerX 
 
-   # self.target = self.chooseTarget(self.mode, gameState)
+    self.chooseTarget(self.mode, gameState, centerX)
 
-    if self.red: 
-        if(self.target[0] <= centerX and gameState.getAgentPosition(self.index)[0] <= centerX): #if the current target and agent are on RED side of the board
-            # Get list of food and enemy positions
-            foodList = self.getFood(gameState).asList()
-            enemy1pos = gameState.getAgentPosition((self.index+1) % 4)
-            enemy2pos = gameState.getAgentPosition((self.index+3) % 4)
+    # if self.red: 
+    #     if(self.target[0] <= centerX and gameState.getAgentPosition(self.index)[0] <= centerX): #if the current target and agent are on RED side of the board
+    #         # Get list of food and enemy positions
+    #         foodList = self.getFood(gameState).asList()
+    #         enemy1pos = gameState.getAgentPosition((self.index+1) % 4)
+    #         enemy2pos = gameState.getAgentPosition((self.index+3) % 4)
 
-            # greedy and dumb foodie
-            foodDistances = []
-            for food in foodList: 
-                if (self.getMazeDistance(food, enemy1pos) > self.getMazeDistance(food, gameState.getAgentPosition(self.index)) and self.getMazeDistance(food, enemy2pos) > self.getMazeDistance(food, gameState.getAgentPosition(self.index))): 
-                    foodDistances.append((food, self.getMazeDistance(food, gameState.getAgentPosition(self.index)),))
-                    minDist = min(f[1] for f in foodDistances)
-                    for f in foodDistances:
-                        if f[1] == minDist:
-                            self.target = f[0]
-                            #print(f[0])
+    #         # greedy and dumb foodie
+    #         foodDistances = []
+    #         for food in foodList: 
+    #             if (self.getMazeDistance(food, enemy1pos) > self.getMazeDistance(food, gameState.getAgentPosition(self.index)) and self.getMazeDistance(food, enemy2pos) > self.getMazeDistance(food, gameState.getAgentPosition(self.index))): 
+    #                 foodDistances.append((food, self.getMazeDistance(food, gameState.getAgentPosition(self.index)),))
+    #                 minDist = min(f[1] for f in foodDistances)
+    #                 for f in foodDistances:
+    #                     if f[1] == minDist:
+    #                         self.target = f[0]
+    #                         #print(f[0])
     
-    else: #if blue
-        if(self.target[0] >= centerX and gameState.getAgentPosition(self.index)[0] >= centerX): #if the current target and agent are on BLUE side of the board
-            # Get list of food and enemy positions
-            foodList = self.getFood(gameState).asList()
-            enemy1pos = gameState.getAgentPosition((self.index+1) % 4)
-            enemy2pos = gameState.getAgentPosition((self.index+3) % 4)
+    # else: #if blue
+    #     if(self.target[0] >= centerX and gameState.getAgentPosition(self.index)[0] >= centerX): #if the current target and agent are on BLUE side of the board
+    #         # Get list of food and enemy positions
+    #         foodList = self.getFood(gameState).asList()
+    #         enemy1pos = gameState.getAgentPosition((self.index+1) % 4)
+    #         enemy2pos = gameState.getAgentPosition((self.index+3) % 4)
 
-            # greedy and dumb foodie
-            foodDistances = []
-            for food in foodList: 
-                if (self.getMazeDistance(food, enemy1pos) > self.getMazeDistance(food, gameState.getAgentPosition(self.index)) and self.getMazeDistance(food, enemy2pos) > self.getMazeDistance(food, gameState.getAgentPosition(self.index))): 
-                    foodDistances.append((food, self.getMazeDistance(food, gameState.getAgentPosition(self.index)),))
-                    minDist = min(f[1] for f in foodDistances)
-                    for f in foodDistances:
-                        if f[1] == minDist:
-                            self.target = f[0]
-                            #print(f[0])
+    #         # greedy and dumb foodie
+    #         foodDistances = []
+    #         for food in foodList: 
+    #             if (self.getMazeDistance(food, enemy1pos) > self.getMazeDistance(food, gameState.getAgentPosition(self.index)) and self.getMazeDistance(food, enemy2pos) > self.getMazeDistance(food, gameState.getAgentPosition(self.index))): 
+    #                 foodDistances.append((food, self.getMazeDistance(food, gameState.getAgentPosition(self.index)),))
+    #                 minDist = min(f[1] for f in foodDistances)
+    #                 for f in foodDistances:
+    #                     if f[1] == minDist:
+    #                         self.target = f[0]
+    #                         #print(f[0])
     
-    #once food captured, reset to center
-    if self.red: 
-      if not (gameState.hasFood(self.target[0], self.target[1])) and self.target[0] > centerX: 
-        for x in range(1, centerX): 
-            if not gameState.hasWall(x, gameState.getAgentPosition(self.index)[1]): 
-              recovery = (x, gameState.getAgentPosition(self.index)[1])
-        self.target = recovery
-    else: #if blue team
-      if not (gameState.hasFood(self.target[0], self.target[1])) and self.target[0] < centerX: 
-        for x in range(centerX, gameState.data.layout.width-1):
-          if not gameState.hasWall(x, gameState.getAgentPosition(self.index)[1]): 
-              recovery = (x, gameState.getAgentPosition(self.index)[1])
-              break
-        self.target = recovery
+    # #once food captured, reset to center
+    # if self.red: 
+    #   if not (gameState.hasFood(self.target[0], self.target[1])) and self.target[0] > centerX: 
+    #     for x in range(1, centerX): 
+    #         if not gameState.hasWall(x, gameState.getAgentPosition(self.index)[1]): 
+    #           recovery = (x, gameState.getAgentPosition(self.index)[1])
+    #     self.target = recovery
+    # else: #if blue team
+    #   if not (gameState.hasFood(self.target[0], self.target[1])) and self.target[0] < centerX: 
+    #     for x in range(centerX, gameState.data.layout.width-1):
+    #       if not gameState.hasWall(x, gameState.getAgentPosition(self.index)[1]): 
+    #           recovery = (x, gameState.getAgentPosition(self.index)[1])
+    #           break
+    #     self.target = recovery
         
     # Select the best move to that goal 
   
@@ -446,15 +447,12 @@ class SmartAgent(ReflexCaptureAgent): #currently only attacking
     # if len(actions)>1: 
     #   actions.remove('Stop')
 
-
-
     enemy1pos = gameState.getAgentPosition((self.index+1) % 4)
     enemy2pos = gameState.getAgentPosition((self.index+3) % 4)
     moveValues = []
 
-
-# if it makes me closer to ghost, large. 
-# TO DO: Add logic so that it only does this on the enemy's side
+    # if it makes me closer to ghost, large. 
+    # TO DO: Add logic so that it only does this on the enemy's side
     for a in actions: 
       nextState = gameState.generateSuccessor(self.index, a)
       newpos = nextState.getAgentPosition(self.index)
