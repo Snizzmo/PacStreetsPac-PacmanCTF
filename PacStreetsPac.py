@@ -229,12 +229,12 @@ class CenterAgent(ReflexCaptureAgent):
     mirrorY = ((enemy1pos[1] + enemy2pos[1]) / 2)
     #if we red
     if self.red: 
-      for x in range(1, centerX): 
+      for x in range(1, centerX+1): 
           if not gameState.hasWall(x, mirrorY): 
             mirrorX = x
       #set the target to the enermy average
-      if (gameState.getAgentPosition(self.index)[0] <= centerX) and (gameState.getAgentPosition(self.index)[0] > ((gameState.data.layout.width / 2) - (gameState.data.layout.width / 8))):
-        self.target = (mirrorX, mirrorY)
+      # if (gameState.getAgentPosition(self.index)[0] <= centerX) and (gameState.getAgentPosition(self.index)[0] > ((gameState.data.layout.width / 2) - (gameState.data.layout.width / 8))):
+      #   self.target = (mirrorX, mirrorY)
     #if we blue
     else: 
       #print(range(centerX, gameState.data.layout.width))
@@ -244,8 +244,8 @@ class CenterAgent(ReflexCaptureAgent):
             break
         else:
           continue
-      if (gameState.getAgentPosition(self.index)[0] >= centerX) and (gameState.getAgentPosition(self.index)[0] < ((gameState.data.layout.width / 2) + (gameState.data.layout.width / 8))):
-        self.target = (mirrorX, mirrorY)
+      # if (gameState.getAgentPosition(self.index)[0] >= centerX) and (gameState.getAgentPosition(self.index)[0] < ((gameState.data.layout.width / 2) + (gameState.data.layout.width / 8))):
+      #   self.target = (mirrorX, mirrorY)
 
 
   # Simple chasing defense  
@@ -257,10 +257,7 @@ class CenterAgent(ReflexCaptureAgent):
         self.target = enemy2pos
       else: 
         self.target = (mirrorX, mirrorY)
-        # if (gameState.getAgentPosition(self.index)[0] <= centerX) and (gameState.getAgentPosition(self.index)[0] > (gameState.data.layout.width / 2) - (gameState.data.layout.width / 8)):
-        #   self.target = (mirrorX, mirrorY)
-        # else:
-        #   self.setCenter(gameState)
+
     # if we blue
     else: 
       if enemy1pos[0] >= centerX: 
@@ -268,12 +265,7 @@ class CenterAgent(ReflexCaptureAgent):
       elif enemy2pos[0] >= centerX: 
         self.target = enemy2pos
       else: 
-        self.target = (mirrorX, mirrorY)
-        # if (gameState.getAgentPosition(self.index)[0] >= centerX) and (gameState.getAgentPosition(self.index)[0] < (gameState.data.layout.width / 2) + (gameState.data.layout.width / 8)):
-        #   self.target = (mirrorX, mirrorY)
-        # else:
-        #   self.setCenter(gameState)
-      
+        self.target = (mirrorX, mirrorY)  
         
     # Select the best move to that goal
     fvalues = []
@@ -322,6 +314,21 @@ class SmartAgent(ReflexCaptureAgent): #currently only attacking
         self.defaultPos.remove(self.defaultPos[-1])
     self.target = self.defaultPos[0] #Set the target
 
+  # Helper function to find the closest x,y on our team side
+  def closestHomeTurf(self, gameState):
+    cX = self.findCenterX(gameState)
+    if self.red: 
+      for x in range(1, cX): 
+          if not gameState.hasWall(x, gameState.getAgentPosition(self.index)[1]): 
+            recovery = (x, gameState.getAgentPosition(self.index)[1])
+    else: #if blue team
+      for x in range(cX, gameState.data.layout.width-1):
+        if not gameState.hasWall(x, gameState.getAgentPosition(self.index)[1]): 
+            recovery = (x, gameState.getAgentPosition(self.index)[1])
+            break
+    return recovery
+
+  # pick the target based on the mode
   def chooseTarget(self, mode, gameState, centerX):
     if mode == 'attack':
       # target the closest food if I am on safe side of board 
@@ -339,12 +346,8 @@ class SmartAgent(ReflexCaptureAgent): #currently only attacking
             minDist = min(f[1] for f in foodDistances)
             targets = [f[0] for f in foodDistances if f[1] == minDist]
             self.target = min(targets)
-            # for f in foodDistances:
-            #     if f[1] == minDist:
-            #       self.target = f[0]
-      #else (I am on opponent side of board)
 
-      #once food captured, reset to center
+      #once food captured, reset to centerX
       if self.red: 
         if not (gameState.hasFood(self.target[0], self.target[1])) and self.target[0] > centerX: 
           for x in range(1, centerX): 
@@ -368,7 +371,7 @@ class SmartAgent(ReflexCaptureAgent): #currently only attacking
     # else: 
     #   code
 
-
+  #pick and action
   def chooseAction(self, gameState):
     # all possible actions
     actions = gameState.getLegalActions(self.index)
@@ -376,66 +379,6 @@ class SmartAgent(ReflexCaptureAgent): #currently only attacking
     centerX = self.findCenterX(gameState) #find the centerX 
 
     self.chooseTarget(self.mode, gameState, centerX)
-
-    # if self.red: 
-    #     if(self.target[0] <= centerX and gameState.getAgentPosition(self.index)[0] <= centerX): #if the current target and agent are on RED side of the board
-    #         # Get list of food and enemy positions
-    #         foodList = self.getFood(gameState).asList()
-    #         enemy1pos = gameState.getAgentPosition((self.index+1) % 4)
-    #         enemy2pos = gameState.getAgentPosition((self.index+3) % 4)
-
-    #         # greedy and dumb foodie
-    #         foodDistances = []
-    #         for food in foodList: 
-    #             if (self.getMazeDistance(food, enemy1pos) > self.getMazeDistance(food, gameState.getAgentPosition(self.index)) and self.getMazeDistance(food, enemy2pos) > self.getMazeDistance(food, gameState.getAgentPosition(self.index))): 
-    #                 foodDistances.append((food, self.getMazeDistance(food, gameState.getAgentPosition(self.index)),))
-    #                 minDist = min(f[1] for f in foodDistances)
-    #                 for f in foodDistances:
-    #                     if f[1] == minDist:
-    #                         self.target = f[0]
-    #                         #print(f[0])
-    
-    # else: #if blue
-    #     if(self.target[0] >= centerX and gameState.getAgentPosition(self.index)[0] >= centerX): #if the current target and agent are on BLUE side of the board
-    #         # Get list of food and enemy positions
-    #         foodList = self.getFood(gameState).asList()
-    #         enemy1pos = gameState.getAgentPosition((self.index+1) % 4)
-    #         enemy2pos = gameState.getAgentPosition((self.index+3) % 4)
-
-    #         # greedy and dumb foodie
-    #         foodDistances = []
-    #         for food in foodList: 
-    #             if (self.getMazeDistance(food, enemy1pos) > self.getMazeDistance(food, gameState.getAgentPosition(self.index)) and self.getMazeDistance(food, enemy2pos) > self.getMazeDistance(food, gameState.getAgentPosition(self.index))): 
-    #                 foodDistances.append((food, self.getMazeDistance(food, gameState.getAgentPosition(self.index)),))
-    #                 minDist = min(f[1] for f in foodDistances)
-    #                 for f in foodDistances:
-    #                     if f[1] == minDist:
-    #                         self.target = f[0]
-    #                         #print(f[0])
-    
-    # #once food captured, reset to center
-    # if self.red: 
-    #   if not (gameState.hasFood(self.target[0], self.target[1])) and self.target[0] > centerX: 
-    #     for x in range(1, centerX): 
-    #         if not gameState.hasWall(x, gameState.getAgentPosition(self.index)[1]): 
-    #           recovery = (x, gameState.getAgentPosition(self.index)[1])
-    #     self.target = recovery
-    # else: #if blue team
-    #   if not (gameState.hasFood(self.target[0], self.target[1])) and self.target[0] < centerX: 
-    #     for x in range(centerX, gameState.data.layout.width-1):
-    #       if not gameState.hasWall(x, gameState.getAgentPosition(self.index)[1]): 
-    #           recovery = (x, gameState.getAgentPosition(self.index)[1])
-    #           break
-    #     self.target = recovery
-        
-    # Select the best move to that goal 
-  
-    # fvalues = []
-    # for a in actions: 
-    #   nextState = gameState.generateSuccessor(self.index, a)
-    #   newpos = nextState.getAgentPosition(self.index)
-    #   fvalues.append(self.getMazeDistance(newpos, self.target)) #This is saying "Whatever is closer to my goal"
-    # best = min(fvalues) #This picks closest absolite value
 
     # new framework should be: 
     # if it makes me closer to ghost, large. 
@@ -466,21 +409,19 @@ class SmartAgent(ReflexCaptureAgent): #currently only attacking
       if (newDistToGhost1 <= currDistToGhost1 and newDistToGhost1 < 3) or (newDistToGhost2 <= currDistToGhost2 and newDistToGhost2 < 3): #3 should depend on map
         gDists = [newDistToGhost1, newDistToGhost2]
         moveValues.append(max(gDists)*10) #10 should be relative to the map
-        self.setCenter(gameState) # This currently just runs to center. replace with closest x,y on our team's side
+        
+        #Run to home turf
+        self.target = self.closestHomeTurf(gameState)
+        #self.setCenter(gameState) # This currently just runs to center. replace with closest x,y on our team's side
       else:
         moveValues.append(self.getMazeDistance(newpos, self.target))
 
-
-
-    #print(self.target, actions, moveValues)
     best = min(moveValues)
     bestActions = [a for a, v in zip(actions, moveValues) if v == best]
     bestAction = random.choice(bestActions)
     return(bestAction) 
 
-
-#TO DO: Helper function to find the closest x,y on our team side
-#TO DO: add power pellet mode
+#TO DO: add power pellet logic / mode
 
 """
 Pseudocode for the final version
@@ -535,7 +476,7 @@ done1. actions = gameState.getLegalActions(self.index)
 
 
 
-
+# THIS DUDE OLD 
 class OneDot(ReflexCaptureAgent):
   # to set the target: self.target = (#, #)
   # to set the target to the center position of the board: self.setCenter(gameState)
