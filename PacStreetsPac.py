@@ -284,6 +284,18 @@ class SmartAgent(ReflexCaptureAgent): #currently only attacking
     CaptureAgent.__init__(self, index)
     self.target = None 
     self.mode = 'attack'
+  
+  # So... I accidentally a little apocalyptic heresy
+  # every function now gently breaks decades of convention and adds the
+  # entire gamestate as a property of self so these calls can work
+  def X(self):
+    return self.gameState.getAgentPosition(self.index)[0]
+
+  def Y(self):
+    return self.gameState.getAgentPosition(self.index)[1]
+  
+  def Loc(self):
+    return self.gameState.getAgentPosition(self.index)
 
   #This initializes the initital state
   def registerInitialState(self, gameState):
@@ -293,6 +305,7 @@ class SmartAgent(ReflexCaptureAgent): #currently only attacking
   
   # Find the centerX position
   def findCenterX(self, gameState):  #set centerX
+    self.gameState = gameState
     centerX = (gameState.data.layout.width - 2) / 2
     if not self.red: 
       centerX += 1
@@ -300,6 +313,7 @@ class SmartAgent(ReflexCaptureAgent): #currently only attacking
 
   # This sets the target to the center position of the board
   def setCenter(self, gameState):
+    self.gameState = gameState
     centerX = (gameState.data.layout.width - 2) / 2
     if not self.red: 
       centerX += 1
@@ -316,23 +330,25 @@ class SmartAgent(ReflexCaptureAgent): #currently only attacking
 
   # Helper function to find the closest x,y on our team side
   def closestHomeTurf(self, gameState):
+    self.gameState = gameState
     cX = self.findCenterX(gameState)
     if self.red: 
       for x in range(1, cX): 
-          if not gameState.hasWall(x, gameState.getAgentPosition(self.index)[1]): 
-            recovery = (x, gameState.getAgentPosition(self.index)[1])
+          if not gameState.hasWall(x, self.Y()): 
+            recovery = (x, self.Y())
     else: #if blue team
       for x in range(cX, gameState.data.layout.width-1):
-        if not gameState.hasWall(x, gameState.getAgentPosition(self.index)[1]): 
-            recovery = (x, gameState.getAgentPosition(self.index)[1])
+        if not gameState.hasWall(x, self.Y()): 
+            recovery = (x, self.Y())
             break
     return recovery
 
   # pick the target based on the mode
   def chooseTarget(self, mode, gameState, centerX):
+    self.gameState = gameState
     if mode == 'attack':
       # target the closest food if I am on safe side of board 
-      if self.red == (gameState.getAgentPosition(self.index)[0] <= centerX): #I am on my side of board
+      if self.red == (self.X() <= centerX): #I am on my side of board
         # Get list of food and enemy positions
         foodList = self.getFood(gameState).asList()
         enemy1pos = gameState.getAgentPosition((self.index+1) % 4)
@@ -340,9 +356,11 @@ class SmartAgent(ReflexCaptureAgent): #currently only attacking
 
         # find the closest dot 
         foodDistances = []
-        for food in foodList: 
-          if (self.getMazeDistance(food, enemy1pos) > self.getMazeDistance(food, gameState.getAgentPosition(self.index)) and self.getMazeDistance(food, enemy2pos) > self.getMazeDistance(food, gameState.getAgentPosition(self.index))): 
-            foodDistances.append((food, self.getMazeDistance(food, gameState.getAgentPosition(self.index)),))
+        for food in foodList:
+          # there is 1000% a way to split the below conditionals into 
+          # several different functions 
+          if (self.getMazeDistance(food, enemy1pos) > self.getMazeDistance(food, self.Loc()) and self.getMazeDistance(food, enemy2pos) > self.getMazeDistance(food, self.Loc())): 
+            foodDistances.append((food, self.getMazeDistance(food, self.Loc()),))
             minDist = min(f[1] for f in foodDistances)
             targets = [f[0] for f in foodDistances if f[1] == minDist]
             self.target = min(targets)
@@ -351,14 +369,14 @@ class SmartAgent(ReflexCaptureAgent): #currently only attacking
       if self.red: 
         if not (gameState.hasFood(self.target[0], self.target[1])) and self.target[0] > centerX: 
           for x in range(1, centerX): 
-              if not gameState.hasWall(x, gameState.getAgentPosition(self.index)[1]): 
-                recovery = (x, gameState.getAgentPosition(self.index)[1])
+              if not gameState.hasWall(x, self.Y()): 
+                recovery = (x, self.Y())
           self.target = recovery
       else: #if blue team
         if not (gameState.hasFood(self.target[0], self.target[1])) and self.target[0] < centerX: 
           for x in range(centerX, gameState.data.layout.width-1):
-            if not gameState.hasWall(x, gameState.getAgentPosition(self.index)[1]): 
-                recovery = (x, gameState.getAgentPosition(self.index)[1])
+            if not gameState.hasWall(x, self.Y()): 
+                recovery = (x, self.Y())
                 break
           self.target = recovery
       
@@ -373,6 +391,7 @@ class SmartAgent(ReflexCaptureAgent): #currently only attacking
 
   #pick and action
   def chooseAction(self, gameState):
+    self.gameState = gameState
     # all possible actions
     actions = gameState.getLegalActions(self.index)
     # self.runGhosts(gameState, actions) #May not be necessary 
