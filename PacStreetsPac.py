@@ -181,10 +181,10 @@ class SmartAgent(ReflexCaptureAgent):
     self.target = None 
     if self.index < 2: 
       self.mode = 'attack'
-      print("a")
+      # print("a")
     else: 
       self.mode = 'defense'
-      print("d")
+      # print("d")
   
   # So... I accidentally a little apocalyptic heresy
   # every function now gently breaks decades of convention and adds the
@@ -247,6 +247,13 @@ class SmartAgent(ReflexCaptureAgent):
   # pick the target based on the mode
   def chooseTarget(self, mode, gameState, centerX):
     self.gameState = gameState
+    #print(gameState.getScore())
+    if self.red: 
+      if gameState.getScore() >= 1:
+        self.mode = 'bodyguard'
+    else: 
+      if gameState.getScore() <= 1:
+        self.mode = 'bodyguard'
 
     if mode == 'attack':
       # target the closest food if I am on safe side of board 
@@ -264,16 +271,16 @@ class SmartAgent(ReflexCaptureAgent):
           # several different functions 
           #BLUE TEAM BUG: DOESNT ACTUALLY DO THIS
           #print(self.getMazeDistance(food, enemy1pos) > self.getMazeDistance(food, self.Loc()))
-          print(self.Loc())
+          # print(self.Loc())
           #print(enemy1pos)
-          print(enemy2pos)
+          # (enemy2pos)
           if (self.getMazeDistance(food, enemy1pos) > self.getMazeDistance(food, self.Loc())) and (self.getMazeDistance(food, enemy2pos) > self.getMazeDistance(food, self.Loc())): 
-            print("calc")
+            # print("calc")
             foodDistances.append((food, self.getMazeDistance(food, self.Loc()),))
             minDist = min(f[1] for f in foodDistances)
             targets = [f[0] for f in foodDistances if f[1] == minDist]
             self.target = min(targets)
-            print(self.target)
+            # print(self.target)
 
       #once food captured, reset to centerX
       if self.red: 
@@ -289,7 +296,7 @@ class SmartAgent(ReflexCaptureAgent):
                 recovery = (x, self.Y())
                 break
           self.target = recovery
-          print("target is recovery")
+          # print("target is recovery")
 
     elif mode == 'defense': 
       enemy1pos = gameState.getAgentPosition((self.index+1) % 4)
@@ -326,8 +333,39 @@ class SmartAgent(ReflexCaptureAgent):
         else: 
           self.target = (mirrorX, mirrorY)  
 
-    # elif mode == 'bodyguard': 
-    #   code
+    elif mode == 'bodyguard': 
+      enemyToGuardPos = gameState.getAgentPosition((self.index+1) % 4)
+      goToY = enemyToGuardPos[1]
+
+      # print(enemyToGuardPos)
+      # print(enemyToGuardPos[1])
+      if self.red: 
+        for x in range(1, centerX+1): 
+            if not gameState.hasWall(x, enemyToGuardPos[1]): 
+              goToX = x
+      else: # if we blue
+        for x in range(centerX, gameState.data.layout.width): 
+          if not gameState.hasWall(x, enemyToGuardPos[1]): 
+              goToX = x
+              break
+          else:
+            continue
+      self.target = (goToX, goToY)
+
+      #Copypasta from defense
+      enemy1pos = gameState.getAgentPosition((self.index+1) % 4)
+      enemy2pos = gameState.getAgentPosition((self.index+3) % 4)
+      if self.red: 
+        if enemy1pos[0] <= centerX: 
+          self.target = enemy1pos
+        elif enemy2pos[0] <= centerX: 
+          self.target = enemy2pos
+      else: # if we blue
+        if enemy1pos[0] >= centerX: 
+          self.target = enemy1pos
+        elif enemy2pos[0] >= centerX: 
+          self.target = enemy2pos 
+      
     # elif mode == 'yolo': 
     #   code
     # else: 
@@ -359,7 +397,7 @@ class SmartAgent(ReflexCaptureAgent):
 
     # if it makes me closer to ghost, large. 
     if self.red == (self.X() >= (gameState.data.layout.width - 2) / 2): # it only does this on the enemy's side
-      print("Avoid trouble")
+      # print("Avoid trouble")
       for a in actions: 
         nextState = gameState.generateSuccessor(self.index, a)
         newpos = nextState.getAgentPosition(self.index)
