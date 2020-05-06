@@ -251,8 +251,8 @@ class SmartAgent(ReflexCaptureAgent):
     else: 
       capsules = gameState.getRedCapsules()
     for c in capsules: 
-      if self.getMazeDistance(self.Loc(), c) > self.getMazeDistance(self.Loc(), closestSafe): 
-        print("safe capsule")
+      if self.getMazeDistance(self.Loc(), c) < self.getMazeDistance(self.Loc(), closestSafe): 
+        # print("safe capsule")
         closestSafe = c  
     return(closestSafe)
 
@@ -264,6 +264,20 @@ class SmartAgent(ReflexCaptureAgent):
     newTarget = False
     for food in foodList: 
       if (self.getMazeDistance(food, enemy1pos) > self.getMazeDistance(food, self.Loc())) and (self.getMazeDistance(food, enemy2pos) > self.getMazeDistance(food, self.Loc())):
+        foodDistances.append((food, self.getMazeDistance(food, self.Loc()),))
+        minDist = min(f[1] for f in foodDistances)
+        targets = [f[0] for f in foodDistances if f[1] == minDist]
+        newTarget = min(targets)
+    return(newTarget)
+
+  def getSafeFood2(self, gameState): 
+    foodList = self.getFood(gameState).asList()
+    foodDistances = []
+    enemy1pos = gameState.getAgentPosition((self.index+1) % 4)
+    enemy2pos = gameState.getAgentPosition((self.index+3) % 4)
+    newTarget = False
+    for food in foodList: 
+      if (self.getMazeDistance(self.Loc(), enemy1pos) > self.getMazeDistance(food, self.Loc())) and (self.getMazeDistance(self.Loc(), enemy2pos) > self.getMazeDistance(food, self.Loc())):
         foodDistances.append((food, self.getMazeDistance(food, self.Loc()),))
         minDist = min(f[1] for f in foodDistances)
         targets = [f[0] for f in foodDistances if f[1] == minDist]
@@ -316,18 +330,18 @@ class SmartAgent(ReflexCaptureAgent):
       # once food captured, reset to centerX
       if self.red: 
         if not (gameState.hasFood(self.target[0], self.target[1])) and self.target[0] > centerX: 
-          if self.getSafeFood(gameState):
-            self.target = self.getSafeFood(gameState)
+          if self.getSafeFood2(gameState):
+            self.target = self.getSafeFood2(gameState)
           else: 
-            self.target = self.closestHomeTurf(gameState)
-            # self.target = self.closestSafety(gameState)
+            # self.target = self.closestHomeTurf(gameState)
+            self.target = self.closestSafety(gameState)
       else: #if blue team
         if not (gameState.hasFood(self.target[0], self.target[1])) and self.target[0] < centerX: 
-          if self.getSafeFood(gameState):
-            self.target = self.getSafeFood(gameState)
+          if self.getSafeFood2(gameState):
+            self.target = self.getSafeFood2(gameState)
           else: 
-            self.target = self.closestHomeTurf(gameState)
-            # self.target = self.closestSafety(gameState)
+            # self.target = self.closestHomeTurf(gameState)
+            self.target = self.closestSafety(gameState)
 
     elif mode == 'defense': 
       enemy1pos = gameState.getAgentPosition((self.index+1) % 4)
@@ -426,9 +440,10 @@ class SmartAgent(ReflexCaptureAgent):
     # self.runGhosts(gameState, actions) #May not be necessary 
     centerX = self.findCenterX(gameState) #find the centerX 
 
-    # If attacker is closer than defender; swap roles? 
-    
+    enemy1pos = gameState.getAgentPosition((self.index+1) % 4)
+    enemy2pos = gameState.getAgentPosition((self.index+3) % 4)
 
+    # If attacker is closer than defender; swap roles? 
 
     self.chooseTarget(self.mode, gameState, centerX)
 
@@ -442,8 +457,6 @@ class SmartAgent(ReflexCaptureAgent):
     # if len(actions)>1: 
     #   actions.remove('Stop')
 
-    enemy1pos = gameState.getAgentPosition((self.index+1) % 4)
-    enemy2pos = gameState.getAgentPosition((self.index+3) % 4)
     moveValues = []
     # if it makes me closer to ghost, large. 
     # if self.red == (self.X() >= (gameState.data.layout.width - 2) / 2): # it only does this on the enemy's side
@@ -459,13 +472,13 @@ class SmartAgent(ReflexCaptureAgent):
         currDistToGhost2 = (self.distancer.getDistance(gameState.getAgentPosition(self.index), enemy2pos))
         newDistToGhost2 = (self.distancer.getDistance(nextState.getAgentPosition(self.index), enemy2pos))
 
-        if (newDistToGhost1 <= currDistToGhost1 and newDistToGhost1 < 3) or (newDistToGhost2 <= currDistToGhost2 and newDistToGhost2 < 3): #3 should depend on map
+        if (newDistToGhost1 <= currDistToGhost1 and newDistToGhost1 < 2) or (newDistToGhost2 <= currDistToGhost2 and newDistToGhost2 < 2): #3 should depend on map
           gDists = [newDistToGhost1, newDistToGhost2]
           moveValues.append(max(gDists)*10) #10 should be relative to the map
           
           #Run to home turf
-          self.target = self.closestHomeTurf(gameState)
-          # self.target = self.closestSafety(gameState)
+          # self.target = self.closestHomeTurf(gameState)
+          self.target = self.closestSafety(gameState)
         else:
           moveValues.append(self.getMazeDistance(newpos, self.target))
     else: 
