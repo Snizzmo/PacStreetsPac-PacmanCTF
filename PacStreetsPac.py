@@ -460,8 +460,7 @@ class SmartAgent(ReflexCaptureAgent):
     # if it makes me closer to ghost, large. 
     # if self.red == (self.X() >= (gameState.data.layout.width - 2) / 2): # it only does this on the enemy's side
 
-    # print(gameState.getAgentState((self.index+1)%4).scaredTimer)
-
+    # Doesnt avoid ghosts if both ghosts are edible; if one gets eaten, we run from both again
     if gameState.getAgentState(self.index).isPacman and (gameState.getAgentState((self.index+1)%4).scaredTimer == 0) and (gameState.getAgentState((self.index+3)%4).scaredTimer == 0) : # it only does this on the enemy's side
       
       # print("Avoid trouble")
