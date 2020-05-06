@@ -185,7 +185,7 @@ class SmartAgent(ReflexCaptureAgent):
     else: 
       self.mode = 'defense'
       # print("d")
-  
+
   # So... I accidentally a little apocalyptic heresy
   # every function now gently breaks decades of convention and adds the
   # entire gamestate as a property of self so these calls can work
@@ -244,37 +244,68 @@ class SmartAgent(ReflexCaptureAgent):
             break
     return recovery
 
+  def closestSafety(self, gameState): 
+    closestSafe = self.closestHomeTurf(gameState)
+    if self.red: 
+      capsules = gameState.getBlueCapsules()
+    else: 
+      capsules = gameState.getRedCapsules()
+    for c in capsules: 
+      if self.getMazeDistance(self.Loc(), c) > self.getMazeDistance(self.Loc(), closestSafe): 
+        print("safe capsule")
+        closestSafe = c  
+    return(closestSafe)
+
+  def getSafeFood(self, gameState): 
+    foodList = self.getFood(gameState).asList()
+    foodDistances = []
+    enemy1pos = gameState.getAgentPosition((self.index+1) % 4)
+    enemy2pos = gameState.getAgentPosition((self.index+3) % 4)
+    newTarget = False
+    for food in foodList: 
+      if (self.getMazeDistance(food, enemy1pos) > self.getMazeDistance(food, self.Loc())) and (self.getMazeDistance(food, enemy2pos) > self.getMazeDistance(food, self.Loc())):
+        foodDistances.append((food, self.getMazeDistance(food, self.Loc()),))
+        minDist = min(f[1] for f in foodDistances)
+        targets = [f[0] for f in foodDistances if f[1] == minDist]
+        newTarget = min(targets)
+    return(newTarget)
+
+
   # pick the target based on the mode
   def chooseTarget(self, mode, gameState, centerX):
     self.gameState = gameState
-    #print(gameState.getScore())
+
+    #DO NOT FORGET TO UNCOMMENT THIS
+    # print(gameState.getScore())
     if self.red: 
-      if gameState.getScore() >= 1:
+      #print("setting bodyguard")
+      if gameState.getScore() >= 8:
         self.mode = 'bodyguard'
     else: 
-      if gameState.getScore() <= 1:
+      #print("setting bodyguard")
+      if gameState.getScore() <= -8:
         self.mode = 'bodyguard'
 
     if mode == 'attack':
       # target the closest food if I am on safe side of board 
-      if self.red == (self.X() <= (gameState.data.layout.width - 2) / 2): #I am on my side of board
+      # Patrol the closestX up and down? 
+      #print(gameState.getAgentState(self.index).isPacman)
+      #if self.red == (self.X() <= (gameState.data.layout.width - 2) / 2): #I am on my side of board
+      # if self.X() < (self.findCenterX(gameState) - 5): 
+      #   self.setCenter(gameState)
+
+      
+
+      if not gameState.getAgentState(self.index).isPacman:
         # Get list of food and enemy positions
         foodList = self.getFood(gameState).asList()
         enemy1pos = gameState.getAgentPosition((self.index+1) % 4)
         enemy2pos = gameState.getAgentPosition((self.index+3) % 4)
-
         # find the closest dot 
         foodDistances = []
         for food in foodList:
-          #print("food")
-          # there is 1000% a way to split the below conditionals into 
-          # several different functions 
-          #BLUE TEAM BUG: DOESNT ACTUALLY DO THIS
-          #print(self.getMazeDistance(food, enemy1pos) > self.getMazeDistance(food, self.Loc()))
-          # print(self.Loc())
-          #print(enemy1pos)
-          # (enemy2pos)
-          if (self.getMazeDistance(food, enemy1pos) > self.getMazeDistance(food, self.Loc())) and (self.getMazeDistance(food, enemy2pos) > self.getMazeDistance(food, self.Loc())): 
+          # if we are closer to a  food than the enemy is: 
+          if (self.getMazeDistance(food, enemy1pos) > self.getMazeDistance(food, self.Loc())) and (self.getMazeDistance(food, enemy2pos) > self.getMazeDistance(food, self.Loc())):
             # print("calc")
             foodDistances.append((food, self.getMazeDistance(food, self.Loc()),))
             minDist = min(f[1] for f in foodDistances)
@@ -282,21 +313,21 @@ class SmartAgent(ReflexCaptureAgent):
             self.target = min(targets)
             # print(self.target)
 
-      #once food captured, reset to centerX
+      # once food captured, reset to centerX
       if self.red: 
         if not (gameState.hasFood(self.target[0], self.target[1])) and self.target[0] > centerX: 
-          for x in range(1, centerX): 
-              if not gameState.hasWall(x, self.Y()): 
-                recovery = (x, self.Y())
-          self.target = recovery
+          if self.getSafeFood(gameState):
+            self.target = self.getSafeFood(gameState)
+          else: 
+            self.target = self.closestHomeTurf(gameState)
+            # self.target = self.closestSafety(gameState)
       else: #if blue team
         if not (gameState.hasFood(self.target[0], self.target[1])) and self.target[0] < centerX: 
-          for x in range(centerX, gameState.data.layout.width-1):
-            if not gameState.hasWall(x, self.Y()): 
-                recovery = (x, self.Y())
-                break
-          self.target = recovery
-          # print("target is recovery")
+          if self.getSafeFood(gameState):
+            self.target = self.getSafeFood(gameState)
+          else: 
+            self.target = self.closestHomeTurf(gameState)
+            # self.target = self.closestSafety(gameState)
 
     elif mode == 'defense': 
       enemy1pos = gameState.getAgentPosition((self.index+1) % 4)
@@ -305,7 +336,7 @@ class SmartAgent(ReflexCaptureAgent):
       mirrorY = ((enemy1pos[1] + enemy2pos[1]) / 2)
       #if we red
       if self.red: 
-        for x in range(1, centerX+1): 
+        for x in range(1, centerX): 
             if not gameState.hasWall(x, mirrorY): 
               mirrorX = x
       else: # if we blue
@@ -318,20 +349,36 @@ class SmartAgent(ReflexCaptureAgent):
 
       # Simple chasing defense  
       # if we red
-      if self.red: 
-        if enemy1pos[0] <= centerX: 
-          self.target = enemy1pos
-        elif enemy2pos[0] <= centerX: 
-          self.target = enemy2pos
-        else: 
-          self.target = (mirrorX, mirrorY)
-      else: # if we blue
-        if enemy1pos[0] >= centerX: 
-          self.target = enemy1pos
-        elif enemy2pos[0] >= centerX: 
-          self.target = enemy2pos
-        else: 
-          self.target = (mirrorX, mirrorY)  
+      # if self.red: 
+      #   if enemy1pos[0] <= centerX: 
+      #     self.target = enemy1pos
+      #   elif enemy2pos[0] <= centerX: 
+      #     self.target = enemy2pos
+      #   else: 
+      #     self.target = (mirrorX, mirrorY)
+      # else: # if we blue
+      #   if enemy1pos[0] >= centerX: 
+      #     self.target = enemy1pos
+      #   elif enemy2pos[0] >= centerX: 
+      #     self.target = enemy2pos
+      #   else: 
+      #     self.target = (mirrorX, mirrorY) 
+
+
+      enemies = [(self.index+1)%4, (self.index+3)%4]
+      #if self.red: 
+      enemyDistance = 999999
+      newTargetEnemy = None
+      for e in enemies: 
+        if gameState.getAgentState(e).isPacman: 
+          if (self.distancer.getDistance(gameState.getAgentPosition(self.index), gameState.getAgentPosition(e))) < enemyDistance: 
+            newTargetEnemy = gameState.getAgentPosition(e)
+            enemyDistance = (self.distancer.getDistance(gameState.getAgentPosition(self.index), newTargetEnemy))
+      if newTargetEnemy: 
+        self.target = newTargetEnemy
+      else: 
+        self.target = (mirrorX, mirrorY)
+
 
     elif mode == 'bodyguard': 
       enemyToGuardPos = gameState.getAgentPosition((self.index+1) % 4)
@@ -340,7 +387,7 @@ class SmartAgent(ReflexCaptureAgent):
       # print(enemyToGuardPos)
       # print(enemyToGuardPos[1])
       if self.red: 
-        for x in range(1, centerX+1): 
+        for x in range(1, centerX): 
             if not gameState.hasWall(x, enemyToGuardPos[1]): 
               goToX = x
       else: # if we blue
@@ -379,6 +426,10 @@ class SmartAgent(ReflexCaptureAgent):
     # self.runGhosts(gameState, actions) #May not be necessary 
     centerX = self.findCenterX(gameState) #find the centerX 
 
+    # If attacker is closer than defender; swap roles? 
+    
+
+
     self.chooseTarget(self.mode, gameState, centerX)
 
     # new framework should be: 
@@ -394,9 +445,9 @@ class SmartAgent(ReflexCaptureAgent):
     enemy1pos = gameState.getAgentPosition((self.index+1) % 4)
     enemy2pos = gameState.getAgentPosition((self.index+3) % 4)
     moveValues = []
-
     # if it makes me closer to ghost, large. 
-    if self.red == (self.X() >= (gameState.data.layout.width - 2) / 2): # it only does this on the enemy's side
+    # if self.red == (self.X() >= (gameState.data.layout.width - 2) / 2): # it only does this on the enemy's side
+    if gameState.getAgentState(self.index).isPacman: # it only does this on the enemy's side
       # print("Avoid trouble")
       for a in actions: 
         nextState = gameState.generateSuccessor(self.index, a)
@@ -414,7 +465,7 @@ class SmartAgent(ReflexCaptureAgent):
           
           #Run to home turf
           self.target = self.closestHomeTurf(gameState)
-          #self.setCenter(gameState) # This currently just runs to center. replace with closest x,y on our team's side
+          # self.target = self.closestSafety(gameState)
         else:
           moveValues.append(self.getMazeDistance(newpos, self.target))
     else: 
