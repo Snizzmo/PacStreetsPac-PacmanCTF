@@ -290,7 +290,6 @@ class SmartAgent(ReflexCaptureAgent):
     self.gameState = gameState
 
     #DO NOT FORGET TO UNCOMMENT THIS
-    # print(gameState.getScore())
     if self.red: 
       #print("setting bodyguard")
       if gameState.getScore() >= 8:
@@ -380,7 +379,7 @@ class SmartAgent(ReflexCaptureAgent):
 
 
       enemies = [(self.index+1)%4, (self.index+3)%4]
-      #if self.red: 
+
       enemyDistance = 999999
       newTargetEnemy = None
       for e in enemies: 
@@ -413,7 +412,7 @@ class SmartAgent(ReflexCaptureAgent):
             continue
       self.target = (goToX, goToY)
 
-      #Copypasta from defense
+      # eat nearest enemy
       enemy1pos = gameState.getAgentPosition((self.index+1) % 4)
       enemy2pos = gameState.getAgentPosition((self.index+3) % 4)
       if self.red: 
@@ -460,7 +459,11 @@ class SmartAgent(ReflexCaptureAgent):
     moveValues = []
     # if it makes me closer to ghost, large. 
     # if self.red == (self.X() >= (gameState.data.layout.width - 2) / 2): # it only does this on the enemy's side
-    if gameState.getAgentState(self.index).isPacman: # it only does this on the enemy's side
+
+    # print(gameState.getAgentState((self.index+1)%4).scaredTimer)
+
+    if gameState.getAgentState(self.index).isPacman and (gameState.getAgentState((self.index+1)%4).scaredTimer == 0) and (gameState.getAgentState((self.index+3)%4).scaredTimer == 0) : # it only does this on the enemy's side
+      
       # print("Avoid trouble")
       for a in actions: 
         nextState = gameState.generateSuccessor(self.index, a)
