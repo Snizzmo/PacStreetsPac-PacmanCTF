@@ -329,15 +329,15 @@ class SmartAgent(ReflexCaptureAgent):
       # once food captured, reset to centerX
       if self.red: 
         if not (gameState.hasFood(self.target[0], self.target[1])) and self.target[0] > centerX: 
-          if self.getSafeFood2(gameState):
-            self.target = self.getSafeFood2(gameState)
+          if self.getSafeFood(gameState):
+            self.target = self.getSafeFood(gameState)
           else: 
             # self.target = self.closestHomeTurf(gameState)
             self.target = self.closestSafety(gameState)
       else: #if blue team
         if not (gameState.hasFood(self.target[0], self.target[1])) and self.target[0] < centerX: 
-          if self.getSafeFood2(gameState):
-            self.target = self.getSafeFood2(gameState)
+          if self.getSafeFood(gameState):
+            self.target = self.getSafeFood(gameState)
           else: 
             # self.target = self.closestHomeTurf(gameState)
             self.target = self.closestSafety(gameState)
@@ -443,6 +443,13 @@ class SmartAgent(ReflexCaptureAgent):
     enemy2pos = gameState.getAgentPosition((self.index+3) % 4)
 
     # If attacker is closer than defender; swap roles? 
+    # if not gameState.getAgentState(self.index).isPacman: 
+    #   if (self.getMazeDistance(enemy1pos, self.Loc()) < self.getMazeDistance(self.Loc(), self.target)): 
+    #     self.mode = 'defense'
+    #   elif (self.getMazeDistance(enemy2pos, self.Loc()) < self.getMazeDistance(self.Loc(), self.target)): 
+    #     self.mode = 'defense'
+    #   else: 
+    #     self.mode = 'attack'
 
     self.chooseTarget(self.mode, gameState, centerX)
 
@@ -453,13 +460,13 @@ class SmartAgent(ReflexCaptureAgent):
     # if it makes me near my target, smallest
 
     #remove stops
-    # if len(actions)>1: 
-    #   actions.remove('Stop')
+    # if self.mode == 'attack': 
+    #   if len(actions)>1: 
+    #     actions.remove('Stop')
 
     moveValues = []
-    # if it makes me closer to ghost, large. 
-    # if self.red == (self.X() >= (gameState.data.layout.width - 2) / 2): # it only does this on the enemy's side
-
+    # if it makes me closer to ghost, large.
+    #  
     # Doesnt avoid ghosts if both ghosts are edible; if one gets eaten, we run from both again
     if gameState.getAgentState(self.index).isPacman and (gameState.getAgentState((self.index+1)%4).scaredTimer == 0) and (gameState.getAgentState((self.index+3)%4).scaredTimer == 0) : # it only does this on the enemy's side
       
@@ -474,23 +481,27 @@ class SmartAgent(ReflexCaptureAgent):
         currDistToGhost2 = (self.distancer.getDistance(gameState.getAgentPosition(self.index), enemy2pos))
         newDistToGhost2 = (self.distancer.getDistance(nextState.getAgentPosition(self.index), enemy2pos))
 
-        if (newDistToGhost1 <= currDistToGhost1 and newDistToGhost1 < 2) or (newDistToGhost2 <= currDistToGhost2 and newDistToGhost2 < 2): #3 should depend on map
+        # avoid ghosts
+        if (newDistToGhost1 <= currDistToGhost1 and newDistToGhost1 < 3) or (newDistToGhost2 <= currDistToGhost2 and newDistToGhost2 < 3): # 3 should depend on map
           gDists = [newDistToGhost1, newDistToGhost2]
-          moveValues.append(max(gDists)*10) #10 should be relative to the map
+          moveValues.append(10 + min(gDists)*self.getMazeDistance(newpos, self.target)) #10 maybe should be relative to the map
           
           #Run to home turf
-          # self.target = self.closestHomeTurf(gameState)
           self.target = self.closestSafety(gameState)
         else:
           moveValues.append(self.getMazeDistance(newpos, self.target))
-    else: 
+    
+    
+    else: #not running from ghosts
       for a in actions: 
         nextState = gameState.generateSuccessor(self.index, a)
         newpos = nextState.getAgentPosition(self.index)
         moveValues.append(self.getMazeDistance(newpos, self.target))
+
     best = min(moveValues)
     bestActions = [a for a, v in zip(actions, moveValues) if v == best]
     bestAction = random.choice(bestActions)
+    if self.mode == 'attack': print(actions, moveValues)
     return(bestAction) 
 
 #TO DO: add power pellet logic / mode
