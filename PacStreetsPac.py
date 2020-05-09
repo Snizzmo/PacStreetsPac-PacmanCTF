@@ -292,11 +292,11 @@ class SmartAgent(ReflexCaptureAgent):
     #DO NOT FORGET TO UNCOMMENT THIS
     if self.red: 
       #print("setting bodyguard")
-      if gameState.getScore() >= 1:
+      if gameState.getScore() >= 3:
         self.mode = 'bodyguard'
     else: 
       #print("setting bodyguard")
-      if gameState.getScore() <= -1:
+      if gameState.getScore() <= -3:
         self.mode = 'bodyguard'
 
     if mode == 'attack':
