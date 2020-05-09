@@ -292,11 +292,11 @@ class SmartAgent(ReflexCaptureAgent):
     #DO NOT FORGET TO UNCOMMENT THIS
     if self.red: 
       #print("setting bodyguard")
-      if gameState.getScore() >= 8:
+      if gameState.getScore() >= 1:
         self.mode = 'bodyguard'
     else: 
       #print("setting bodyguard")
-      if gameState.getScore() <= -8:
+      if gameState.getScore() <= -1:
         self.mode = 'bodyguard'
 
     if mode == 'attack':
@@ -413,18 +413,18 @@ class SmartAgent(ReflexCaptureAgent):
       self.target = (goToX, goToY)
 
       # eat nearest enemy
-      enemy1pos = gameState.getAgentPosition((self.index+1) % 4)
-      enemy2pos = gameState.getAgentPosition((self.index+3) % 4)
-      if self.red: 
-        if enemy1pos[0] <= centerX: 
-          self.target = enemy1pos
-        elif enemy2pos[0] <= centerX: 
-          self.target = enemy2pos
-      else: # if we blue
-        if enemy1pos[0] >= centerX: 
-          self.target = enemy1pos
-        elif enemy2pos[0] >= centerX: 
-          self.target = enemy2pos 
+      enemies = [(self.index+1)%4, (self.index+3)%4]
+
+      enemyDistance = 999999
+      newTargetEnemy = None
+      for e in enemies: 
+        if gameState.getAgentState(e).isPacman: 
+          if (self.distancer.getDistance(gameState.getAgentPosition(self.index), gameState.getAgentPosition(e))) < enemyDistance: 
+            newTargetEnemy = gameState.getAgentPosition(e)
+            enemyDistance = (self.distancer.getDistance(gameState.getAgentPosition(self.index), newTargetEnemy))
+      if newTargetEnemy: 
+        self.target = newTargetEnemy
+
       
     # elif mode == 'yolo': 
     #   code
@@ -501,7 +501,7 @@ class SmartAgent(ReflexCaptureAgent):
     best = min(moveValues)
     bestActions = [a for a, v in zip(actions, moveValues) if v == best]
     bestAction = random.choice(bestActions)
-    if self.mode == 'attack': print(actions, moveValues)
+    # if self.mode == 'attack': print(actions, moveValues)
     return(bestAction) 
 
 #TO DO: add power pellet logic / mode
