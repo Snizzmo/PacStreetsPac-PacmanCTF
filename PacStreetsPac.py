@@ -342,6 +342,18 @@ class SmartAgent(ReflexCaptureAgent):
             # self.target = self.closestHomeTurf(gameState)
             self.target = self.closestSafety(gameState)
 
+      #eat nearby enemies
+      enemies = [(self.index+1)%4, (self.index+3)%4]
+      enemyDistance = 999999
+      newTargetEnemy = None
+      for e in enemies: 
+        if gameState.getAgentState(e).isPacman: 
+          if (self.distancer.getDistance(gameState.getAgentPosition(self.index), gameState.getAgentPosition(e))) < enemyDistance: 
+            newTargetEnemy = gameState.getAgentPosition(e)
+            enemyDistance = (self.distancer.getDistance(gameState.getAgentPosition(self.index), newTargetEnemy))
+      if newTargetEnemy: 
+        self.target = newTargetEnemy
+ 
     elif mode == 'defense': 
       enemy1pos = gameState.getAgentPosition((self.index+1) % 4)
       enemy2pos = gameState.getAgentPosition((self.index+3) % 4)
