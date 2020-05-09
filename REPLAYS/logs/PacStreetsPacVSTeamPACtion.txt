@@ -1,0 +1,538 @@
+
+Red team ../pre-friendly/PacStreetsPac.py with {}:
+Loading Team: ../pre-friendly/PacStreetsPac.py
+Arguments: {}
+a
+d
+
+Blue team ../pre-friendly/TeamPACtion.py with {}:
+Loading Team: ../pre-friendly/TeamPACtion.py
+Arguments: {}
+Called random layout
+0
+Called random layout
+0
+Called random layout
+1
+Called random layout
+3
+Called random layout
+1
+Match 1:
+Playing with layout 0
+Red team starts
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+Traceback (most recent call last):
+  File "/home/godiaz/Documents/tournamentReg/codebase/game.py", line 652, in run
+    action = timed_func( observation )
+  File "/home/godiaz/Documents/tournamentReg/codebase/util.py", line 612, in __call__
+    result = self.function(*args, **keyArgs)
+  File "/home/godiaz/Documents/tournamentReg/codebase/captureAgents.py", line 162, in getAction
+    return self.chooseAction(gameState)
+  File "../pre-friendly/TeamPACtion.py", line 302, in chooseAction
+    val = [self.evaluate(gameState, attack) for attack in move]
+  File "../pre-friendly/TeamPACtion.py", line 280, in evaluate
+    values = self.getFeatures(gameState, action)
+  File "../pre-friendly/TeamPACtion.py", line 354, in getFeatures
+    move = self.getSuccessor(gameState, action)
+  File "../pre-friendly/TeamPACtion.py", line 287, in getSuccessor
+    next_move = gameState.generateSuccesor(self.index, action)
+AttributeError: GameState instance has no attribute 'generateSuccesor'
+Blue agent crashed
+recorded
+Playing with layout 0
+Blue team starts
+Traceback (most recent call last):
+  File "/home/godiaz/Documents/tournamentReg/codebase/game.py", line 652, in run
+    action = timed_func( observation )
+  File "/home/godiaz/Documents/tournamentReg/codebase/util.py", line 612, in __call__
+    result = self.function(*args, **keyArgs)
+  File "/home/godiaz/Documents/tournamentReg/codebase/captureAgents.py", line 162, in getAction
+    return self.chooseAction(gameState)
+  File "../pre-friendly/TeamPACtion.py", line 302, in chooseAction
+    val = [self.evaluate(gameState, attack) for attack in move]
+  File "../pre-friendly/TeamPACtion.py", line 280, in evaluate
+    values = self.getFeatures(gameState, action)
+  File "../pre-friendly/TeamPACtion.py", line 354, in getFeatures
+    move = self.getSuccessor(gameState, action)
+  File "../pre-friendly/TeamPACtion.py", line 287, in getSuccessor
+    next_move = gameState.generateSuccesor(self.index, action)
+AttributeError: GameState instance has no attribute 'generateSuccesor'
+Blue agent crashed
+recorded
+Match 2:
+Playing with layout 1
+Red team starts
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+Traceback (most recent call last):
+  File "/home/godiaz/Documents/tournamentReg/codebase/game.py", line 652, in run
+    action = timed_func( observation )
+  File "/home/godiaz/Documents/tournamentReg/codebase/util.py", line 612, in __call__
+    result = self.function(*args, **keyArgs)
+  File "/home/godiaz/Documents/tournamentReg/codebase/captureAgents.py", line 162, in getAction
+    return self.chooseAction(gameState)
+  File "../pre-friendly/TeamPACtion.py", line 302, in chooseAction
+    val = [self.evaluate(gameState, attack) for attack in move]
+  File "../pre-friendly/TeamPACtion.py", line 280, in evaluate
+    values = self.getFeatures(gameState, action)
+  File "../pre-friendly/TeamPACtion.py", line 354, in getFeatures
+    move = self.getSuccessor(gameState, action)
+  File "../pre-friendly/TeamPACtion.py", line 287, in getSuccessor
+    next_move = gameState.generateSuccesor(self.index, action)
+AttributeError: GameState instance has no attribute 'generateSuccesor'
+Blue agent crashed
+recorded
+Playing with layout 1
+Blue team starts
+Traceback (most recent call last):
+  File "/home/godiaz/Documents/tournamentReg/codebase/game.py", line 652, in run
+    action = timed_func( observation )
+  File "/home/godiaz/Documents/tournamentReg/codebase/util.py", line 612, in __call__
+    result = self.function(*args, **keyArgs)
+  File "/home/godiaz/Documents/tournamentReg/codebase/captureAgents.py", line 162, in getAction
+    return self.chooseAction(gameState)
+  File "../pre-friendly/TeamPACtion.py", line 302, in chooseAction
+    val = [self.evaluate(gameState, attack) for attack in move]
+  File "../pre-friendly/TeamPACtion.py", line 280, in evaluate
+    values = self.getFeatures(gameState, action)
+  File "../pre-friendly/TeamPACtion.py", line 354, in getFeatures
+    move = self.getSuccessor(gameState, action)
+  File "../pre-friendly/TeamPACtion.py", line 287, in getSuccessor
+    next_move = gameState.generateSuccesor(self.index, action)
+AttributeError: GameState instance has no attribute 'generateSuccesor'
+Blue agent crashed
+recorded
+Match 3:
+Playing with layout 2
+Red team starts
+(1, 2)
+(32, 16)
+calc
+(18, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+Traceback (most recent call last):
+  File "/home/godiaz/Documents/tournamentReg/codebase/game.py", line 652, in run
+    action = timed_func( observation )
+  File "/home/godiaz/Documents/tournamentReg/codebase/util.py", line 612, in __call__
+    result = self.function(*args, **keyArgs)
+  File "/home/godiaz/Documents/tournamentReg/codebase/captureAgents.py", line 162, in getAction
+    return self.chooseAction(gameState)
+  File "../pre-friendly/TeamPACtion.py", line 302, in chooseAction
+    val = [self.evaluate(gameState, attack) for attack in move]
+  File "../pre-friendly/TeamPACtion.py", line 280, in evaluate
+    values = self.getFeatures(gameState, action)
+  File "../pre-friendly/TeamPACtion.py", line 354, in getFeatures
+    move = self.getSuccessor(gameState, action)
+  File "../pre-friendly/TeamPACtion.py", line 287, in getSuccessor
+    next_move = gameState.generateSuccesor(self.index, action)
+AttributeError: GameState instance has no attribute 'generateSuccesor'
+Blue agent crashed
+recorded
+Playing with layout 2
+Blue team starts
+Traceback (most recent call last):
+  File "/home/godiaz/Documents/tournamentReg/codebase/game.py", line 652, in run
+    action = timed_func( observation )
+  File "/home/godiaz/Documents/tournamentReg/codebase/util.py", line 612, in __call__
+    result = self.function(*args, **keyArgs)
+  File "/home/godiaz/Documents/tournamentReg/codebase/captureAgents.py", line 162, in getAction
+    return self.chooseAction(gameState)
+  File "../pre-friendly/TeamPACtion.py", line 302, in chooseAction
+    val = [self.evaluate(gameState, attack) for attack in move]
+  File "../pre-friendly/TeamPACtion.py", line 280, in evaluate
+    values = self.getFeatures(gameState, action)
+  File "../pre-friendly/TeamPACtion.py", line 354, in getFeatures
+    move = self.getSuccessor(gameState, action)
+  File "../pre-friendly/TeamPACtion.py", line 287, in getSuccessor
+    next_move = gameState.generateSuccesor(self.index, action)
+AttributeError: GameState instance has no attribute 'generateSuccesor'
+Blue agent crashed
+recorded
+Match 4:
+Playing with layout 3
+Red team starts
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+Traceback (most recent call last):
+  File "/home/godiaz/Documents/tournamentReg/codebase/game.py", line 652, in run
+    action = timed_func( observation )
+  File "/home/godiaz/Documents/tournamentReg/codebase/util.py", line 612, in __call__
+    result = self.function(*args, **keyArgs)
+  File "/home/godiaz/Documents/tournamentReg/codebase/captureAgents.py", line 162, in getAction
+    return self.chooseAction(gameState)
+  File "../pre-friendly/TeamPACtion.py", line 302, in chooseAction
+    val = [self.evaluate(gameState, attack) for attack in move]
+  File "../pre-friendly/TeamPACtion.py", line 280, in evaluate
+    values = self.getFeatures(gameState, action)
+  File "../pre-friendly/TeamPACtion.py", line 354, in getFeatures
+    move = self.getSuccessor(gameState, action)
+  File "../pre-friendly/TeamPACtion.py", line 287, in getSuccessor
+    next_move = gameState.generateSuccesor(self.index, action)
+AttributeError: GameState instance has no attribute 'generateSuccesor'
+Blue agent crashed
+recorded
+Playing with layout 3
+Blue team starts
+Traceback (most recent call last):
+  File "/home/godiaz/Documents/tournamentReg/codebase/game.py", line 652, in run
+    action = timed_func( observation )
+  File "/home/godiaz/Documents/tournamentReg/codebase/util.py", line 612, in __call__
+    result = self.function(*args, **keyArgs)
+  File "/home/godiaz/Documents/tournamentReg/codebase/captureAgents.py", line 162, in getAction
+    return self.chooseAction(gameState)
+  File "../pre-friendly/TeamPACtion.py", line 302, in chooseAction
+    val = [self.evaluate(gameState, attack) for attack in move]
+  File "../pre-friendly/TeamPACtion.py", line 280, in evaluate
+    values = self.getFeatures(gameState, action)
+  File "../pre-friendly/TeamPACtion.py", line 354, in getFeatures
+    move = self.getSuccessor(gameState, action)
+  File "../pre-friendly/TeamPACtion.py", line 287, in getSuccessor
+    next_move = gameState.generateSuccesor(self.index, action)
+AttributeError: GameState instance has no attribute 'generateSuccesor'
+Blue agent crashed
+recorded
+Match 5:
+Playing with layout 4
+Red team starts
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+calc
+(22, 15)
+(1, 2)
+(32, 16)
+calc
+(22, 15)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+(1, 2)
+(32, 16)
+Traceback (most recent call last):
+  File "/home/godiaz/Documents/tournamentReg/codebase/game.py", line 652, in run
+    action = timed_func( observation )
+  File "/home/godiaz/Documents/tournamentReg/codebase/util.py", line 612, in __call__
+    result = self.function(*args, **keyArgs)
+  File "/home/godiaz/Documents/tournamentReg/codebase/captureAgents.py", line 162, in getAction
+    return self.chooseAction(gameState)
+  File "../pre-friendly/TeamPACtion.py", line 302, in chooseAction
+    val = [self.evaluate(gameState, attack) for attack in move]
+  File "../pre-friendly/TeamPACtion.py", line 280, in evaluate
+    values = self.getFeatures(gameState, action)
+  File "../pre-friendly/TeamPACtion.py", line 354, in getFeatures
+    move = self.getSuccessor(gameState, action)
+  File "../pre-friendly/TeamPACtion.py", line 287, in getSuccessor
+    next_move = gameState.generateSuccesor(self.index, action)
+AttributeError: GameState instance has no attribute 'generateSuccesor'
+Blue agent crashed
+recorded
+Playing with layout 4
+Blue team starts
+Traceback (most recent call last):
+  File "/home/godiaz/Documents/tournamentReg/codebase/game.py", line 652, in run
+    action = timed_func( observation )
+  File "/home/godiaz/Documents/tournamentReg/codebase/util.py", line 612, in __call__
+    result = self.function(*args, **keyArgs)
+  File "/home/godiaz/Documents/tournamentReg/codebase/captureAgents.py", line 162, in getAction
+    return self.chooseAction(gameState)
+  File "../pre-friendly/TeamPACtion.py", line 302, in chooseAction
+    val = [self.evaluate(gameState, attack) for attack in move]
+  File "../pre-friendly/TeamPACtion.py", line 280, in evaluate
+    values = self.getFeatures(gameState, action)
+  File "../pre-friendly/TeamPACtion.py", line 354, in getFeatures
+    move = self.getSuccessor(gameState, action)
+  File "../pre-friendly/TeamPACtion.py", line 287, in getSuccessor
+    next_move = gameState.generateSuccesor(self.index, action)
+AttributeError: GameState instance has no attribute 'generateSuccesor'
+Blue agent crashed
+recorded
+Winner: PacStreetsPac
+Red Matches: 5
+Blue Matches: 0
+Red Rounds: 10
+Blue Rounds: 0
+Matches: ['Red', 'Red', 'Red', 'Red', 'Red']
+Round Scores: [[1, 1], [1, 1], [1, 1], [1, 1], [1, 1]]

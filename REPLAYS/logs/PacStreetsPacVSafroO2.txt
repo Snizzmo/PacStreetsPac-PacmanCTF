@@ -1,0 +1,89 @@
+
+Red team ../pre-friendly/PacStreetsPac.py with {}:
+Loading Team: ../pre-friendly/PacStreetsPac.py
+Arguments: {}
+a
+d
+
+Blue team ../pre-friendly/afroO2.py with {}:
+Error: The team "../pre-friendly/afroO2.py" could not be loaded! 
+Traceback (most recent call last):
+  File "/home/godiaz/Documents/tournamentReg/codebase/capture.py", line 918, in loadAgents
+    module = imp.load_source('player' + str(int(isRed)), factory)
+  File "../pre-friendly/afroO2.py", line 173, in <module>
+    class DefensiveAgent(reflexCaptureAgent):
+  File "../pre-friendly/afroO2.py", line 175, in DefensiveAgent
+    successor = self.getSuccessor(gameState, action)
+NameError: name 'self' is not defined
+Called random layout
+0
+Called random layout
+0
+Called random layout
+1
+Called random layout
+3
+Called random layout
+1
+Match 1:
+Playing with layout 0
+Red team starts
+Agent 1 failed to load
+Blue agent crashed
+recorded
+Playing with layout 0
+Blue team starts
+Agent 1 failed to load
+Blue agent crashed
+recorded
+Match 2:
+Playing with layout 1
+Red team starts
+Agent 1 failed to load
+Blue agent crashed
+recorded
+Playing with layout 1
+Blue team starts
+Agent 1 failed to load
+Blue agent crashed
+recorded
+Match 3:
+Playing with layout 2
+Red team starts
+Agent 1 failed to load
+Blue agent crashed
+recorded
+Playing with layout 2
+Blue team starts
+Agent 1 failed to load
+Blue agent crashed
+recorded
+Match 4:
+Playing with layout 3
+Red team starts
+Agent 1 failed to load
+Blue agent crashed
+recorded
+Playing with layout 3
+Blue team starts
+Agent 1 failed to load
+Blue agent crashed
+recorded
+Match 5:
+Playing with layout 4
+Red team starts
+Agent 1 failed to load
+Blue agent crashed
+recorded
+Playing with layout 4
+Blue team starts
+Agent 1 failed to load
+Blue agent crashed
+recorded
+Winner: PacStreetsPac
+Red Matches: 5
+Blue Matches: 0
+Red Rounds: 10
+Blue Rounds: 0
+Matches: ['Red', 'Red', 'Red', 'Red', 'Red']
+Round Scores: [[1, 1], [1, 1], [1, 1], [1, 1], [1, 1]]
